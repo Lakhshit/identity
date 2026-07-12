@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identity Security Platform — Saviynt · SailPoint · Okta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d0d0f;--ink2:#3a3a40;--ink3:#72727a;--ink4:#a8a8b0;
+  --line:#e4e4e8;--line2:#f0f0f3;
+  --bg:#f5f5f7;--surface:#ffffff;--s2:#f7f7f9;--s3:#f0f0f3;
+  --sav:#5548C8;--sav-l:#EEEDFD;--sav-m:#8880e0;
+  --sail:#0F5FC2;--sail-l:#E8F1FC;--sail-m:#4d90e0;
+  --okta:#003087;--okta-l:#E8EDF8;--okta-m:#4d72c0;
+  --green:#00875A;--green-bg:#E3F5EF;
+  --amber:#B45309;--amber-bg:#FEF3C7;
+  --red:#B91C1C;--red-bg:#FEE2E2;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{max-width:1180px;margin:0 auto;padding:1.25rem 1rem 3rem}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:.875rem 1.25rem;margin-bottom:.875rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.tlogo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--sav),var(--sail));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tlogo svg{width:19px;height:19px}
+.tname{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.tsub{font-size:11px;color:var(--ink3);margin-top:1px}
+.pswitch{display:flex;gap:6px;margin-left:auto}
+.pp{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:var(--s2);color:var(--ink3);transition:all .2s;font-family:'Space Grotesk',sans-serif;user-select:none}
+.pp:hover{color:var(--ink);border-color:#bbb}
+.pp.on{color:#fff;border-color:transparent}
+.pp-sav.on{background:var(--sav)}.pp-sail.on{background:var(--sail)}.pp-okta.on{background:var(--okta)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:.875rem}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;overflow:hidden;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s;cursor:default}
+.stat:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.stat-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.sval{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--ink);margin-top:4px;letter-spacing:-.5px;transition:all .3s}
+.slbl{font-size:10.5px;color:var(--ink3);margin-top:3px;font-weight:500}
+.ssub{font-size:10.5px;margin-top:3px;font-weight:500}
+
+/* NAV */
+.nav-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius) var(--radius) 0 0;border-bottom:none;padding:0 .625rem;display:flex;overflow-x:auto;scrollbar-width:none}
+.nav-wrap::-webkit-scrollbar{display:none}
+.nt{padding:10px 13px;font-size:12px;font-weight:500;color:var(--ink3);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px}
+.nt svg{width:13px;height:13px;opacity:.7}
+.nt:hover{color:var(--ink)}.nt.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}.nt.on svg{opacity:1}
+
+/* PANES */
+.pane{display:none;background:var(--surface);border:1px solid var(--line);border-radius:0 0 14px 14px;padding:1.375rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}.pane.on{display:block}
+
+/* GRIDS */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.125rem}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.125rem}
+
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;transition:box-shadow .15s,transform .15s}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07);transform:translateY(-1px)}
+.ch{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.ct{font-size:13.5px;font-weight:600;color:var(--ink);font-family:'Space Grotesk',sans-serif;letter-spacing:-.2px}
+.cs{font-size:10.5px;color:var(--ink3);margin-top:1px}
+.cb{font-size:12px;color:var(--ink2);line-height:1.65}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:9px}
+.chip{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.02em}
+.cp{background:var(--sav-l);color:var(--sav)}.cb2{background:var(--sail-l);color:var(--sail)}.ct2{background:var(--okta-l);color:var(--okta)}
+
+/* SECTION BOX */
+.sbox{background:var(--s2);border:1px solid var(--line);border-radius:var(--radius);padding:1.125rem;margin-bottom:1.125rem}
+.sblbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:11px;font-family:'Space Grotesk',sans-serif}
+
+/* PLATFORM BANNER */
+.plat-banner{border-radius:8px;padding:9px 14px;color:#fff;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:700;margin-bottom:11px;letter-spacing:-.2px}
+.bg-sav{background:linear-gradient(135deg,#5548C8,#7066d8)}.bg-sail{background:linear-gradient(135deg,#0F5FC2,#2d7de0)}.bg-okta{background:linear-gradient(135deg,#003087,#1a50a8)}
+
+/* CAPS */
+.caps{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
+.cap{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 10px;transition:border-color .15s}
+.cap:hover{border-color:#bbb}
+.cap-t{font-size:11.5px;font-weight:600;color:var(--ink)}
+.cap-s{font-size:10.5px;color:var(--ink3);margin-top:2px}
+.lay{border-radius:6px;padding:6px 10px;text-align:center;font-size:10.5px;margin-top:5px;font-weight:500}
+.lay-a{background:linear-gradient(135deg,#EEEDFD,#e0e8ff);color:var(--sav);border:1px solid #ccc9f8}
+.lay-s{background:var(--s3);color:var(--ink3);border:1px solid var(--line)}
+
+/* ARCH */
+.src-col{width:110px;flex-shrink:0}
+.src-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink4);margin-bottom:6px;font-family:'Space Grotesk',sans-serif}
+.src-item{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:10px;color:var(--ink3);text-align:center;margin-bottom:4px;line-height:1.35;transition:border-color .15s,color .15s}
+.src-item:hover{border-color:#bbb;color:var(--ink)}
+.src-item span{font-size:9px;color:var(--ink4)}
+.arch-wrap{display:flex;gap:9px;align-items:flex-start}
+.arch-arr{display:flex;align-items:center;padding-top:48px;color:var(--ink4);flex-shrink:0}
+.arch-arr svg{width:16px;height:16px}
+
+/* BARS */
+.br{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.bl{font-size:11.5px;color:var(--ink3);width:135px;flex-shrink:0}
+.bt{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bf{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bf-sav{background:linear-gradient(90deg,var(--sav),var(--sav-m))}.bf-sail{background:linear-gradient(90deg,var(--sail),var(--sail-m))}.bf-okta{background:linear-gradient(90deg,var(--okta),var(--okta-m))}
+.bp{font-size:10.5px;color:var(--ink4);width:30px;text-align:right;font-weight:600;font-family:'Space Grotesk',sans-serif}
+
+/* MATRIX */
+.matrix{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:1.125rem}
+.mh{display:grid;grid-template-columns:170px repeat(3,1fr);background:var(--s2)}
+.mh>div{padding:9px 11px;font-size:11px;font-weight:700;color:var(--ink3);border-bottom:1px solid var(--line);font-family:'Space Grotesk',sans-serif}
+.mh>div:first-child{border-right:1px solid var(--line)}
+.mr{display:grid;grid-template-columns:170px repeat(3,1fr);border-bottom:1px solid var(--line);transition:background .1s}
+.mr:last-child{border-bottom:none}.mr:hover{background:var(--s2)}
+.mr>div{padding:8px 11px;font-size:11.5px;color:var(--ink)}
+.mr>div:first-child{color:var(--ink3);font-weight:600;background:var(--s2);border-right:1px solid var(--line);font-size:11px}
+.ok{color:var(--green);font-weight:600}.wn{color:var(--amber);font-weight:600}.no{color:var(--red);font-weight:600}
+.legend{font-size:10.5px;color:var(--ink4);margin-bottom:1.125rem}
+
+/* JML */
+.jml{display:flex;gap:0;margin-bottom:1.125rem}
+.js{flex:1;text-align:center;padding:12px 4px;border:1px solid var(--line);background:var(--s2);position:relative;transition:background .15s}
+.js:hover{background:var(--s3)}.js:first-child{border-radius:9px 0 0 9px}.js:last-child{border-radius:0 9px 9px 0}.js+.js{border-left:none}
+.ji{font-size:18px;margin-bottom:4px}.jl{font-size:11px;font-weight:700;color:var(--ink);font-family:'Space Grotesk',sans-serif}.jss{font-size:9.5px;color:var(--ink3);margin-top:2px}
+.jarr{position:absolute;right:-10px;top:50%;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line);border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;z-index:1}
+.jarr svg{width:9px;height:9px;color:var(--ink4)}
+
+/* FLOW */
+.fstep{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.fnum{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;font-family:'Space Grotesk',sans-serif}
+.fdash{margin-left:13px;height:13px;border-left:2px dashed var(--line)}
+.fbox{border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--surface);flex:1;transition:border-color .15s}
+.fbox:hover{border-color:#bbb}.fbox-t{font-size:12px;font-weight:600;color:var(--ink)}.fbox-s{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.5}
+
+/* USE CASES */
+.uc{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--line2);align-items:flex-start}
+.uc:last-child{border-bottom:none}
+.uci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.uct{font-size:13px;font-weight:600;color:var(--ink);font-family:'Space Grotesk',sans-serif}
+.ucb{font-size:11.5px;color:var(--ink3);margin-top:4px;line-height:1.6}
+.ucbdg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9.5px;font-weight:700;margin-left:6px;font-family:'Space Grotesk',sans-serif}
+
+/* ── INTERACTIVE INPUTS ── */
+.tool-wrap{background:var(--s2);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:1.125rem;overflow:hidden}
+.tool-header{display:flex;align-items:center;gap:10px;padding:.875rem 1.125rem;background:var(--surface);border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.tool-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tool-title{font-size:13px;font-weight:600;color:var(--ink);font-family:'Space Grotesk',sans-serif}
+.tool-sub{font-size:11px;color:var(--ink3)}
+.tool-toggle{margin-left:auto;color:var(--ink4);transition:transform .2s}
+.tool-toggle.open{transform:rotate(180deg)}
+.tool-body{padding:1rem 1.125rem;display:none}
+.tool-body.open{display:block}
+
+/* SIZING TOOL */
+.sz-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.sz-field label{font-size:11px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;font-family:'Space Grotesk',sans-serif}
+.sz-field input,.sz-field select{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--ink);background:var(--surface);font-family:'Inter',sans-serif;outline:none;transition:border .15s}
+.sz-field input:focus,.sz-field select:focus{border-color:var(--sav)}
+.sz-field input[type=range]{padding:0;height:6px;border:none;accent-color:var(--sav);cursor:pointer;background:none}
+.range-row{display:flex;align-items:center;gap:10px}
+.range-val{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--sav);min-width:50px;text-align:right}
+.rec-btn{width:100%;padding:10px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--sav),var(--sail));color:#fff;font-size:13px;font-weight:600;cursor:pointer;margin-top:.5rem;transition:opacity .15s;font-family:'Space Grotesk',sans-serif}
+.rec-btn:hover{opacity:.88}
+.rec-result{margin-top:1rem;padding:1rem;border-radius:9px;border:1.5px solid;display:none;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rec-result.show{display:block}
+.rec-plat{font-size:14px;font-weight:700;font-family:'Space Grotesk',sans-serif;margin-bottom:6px}
+.rec-why{font-size:12px;line-height:1.65;color:var(--ink2)}
+.rec-stack{margin-top:8px;font-size:11px;font-weight:600;color:var(--ink3)}
+.rec-stack span{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;margin:2px}
+
+/* TIMELINE TOOL */
+.tl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem}
+.tl-phase{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.tl-plat{font-size:11px;font-weight:700;font-family:'Space Grotesk',sans-serif;margin-bottom:8px}
+.tl-bar-wrap{margin-bottom:6px}
+.tl-bar-lbl{font-size:10px;color:var(--ink3);margin-bottom:3px}
+.tl-bar-track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.tl-bar-fill{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.tl-month{font-size:10px;font-weight:700;font-family:'Space Grotesk',sans-serif;margin-top:6px}
+
+/* SCORING TOOL */
+.score-criteria{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.sc-row{display:flex;align-items:center;gap:10px}
+.sc-lbl{font-size:12px;color:var(--ink2);width:170px;flex-shrink:0;font-weight:500}
+.sc-opts{display:flex;gap:5px;flex:1}
+.sc-opt{padding:4px 10px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font-size:11px;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Inter',sans-serif}
+.sc-opt:hover{border-color:#bbb;color:var(--ink)}
+.sc-opt.sel{border-color:transparent;color:#fff;font-weight:600}
+.sc-opt.sel-sav{background:var(--sav)}.sc-opt.sel-sail{background:var(--sail)}.sc-opt.sel-okta{background:var(--okta)}.sc-opt.sel-tie{background:#666}
+.score-result{padding:1rem;border-radius:9px;border:1.5px solid var(--line);margin-top:.5rem;display:none}
+.score-result.show{display:block;animation:fadeUp .25s ease}
+.score-bars{display:flex;flex-direction:column;gap:6px}
+.score-br{display:flex;align-items:center;gap:8px}
+.score-bl{font-size:12px;color:var(--ink2);width:80px;flex-shrink:0;font-weight:500}
+.score-bt{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.score-bf{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.score-winner{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin-bottom:10px}
+.score-why{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-top:8px}
+
+/* CHAT SECTION */
+.chat-wrap{border-radius:0 0 14px 14px;overflow:hidden;margin:-1.375rem}
+.chat-head{display:flex;align-items:center;gap:9px;padding:.875rem 1.125rem;background:var(--s2);border-bottom:1px solid var(--line)}
+.chat-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.chat-htitle{font-size:13px;font-weight:700;color:var(--ink);font-family:'Space Grotesk',sans-serif}
+.chat-hsub{font-size:11px;color:var(--ink3);margin-left:auto}
+.chat-msgs{min-height:280px;max-height:360px;overflow-y:auto;padding:1.125rem;display:flex;flex-direction:column;gap:11px;scroll-behavior:smooth;background:var(--surface)}
+.cm{display:flex;gap:9px;align-items:flex-start;animation:fadeUp .25s ease}
+.cm.u{flex-direction:row-reverse}
+.mav{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mav-s{background:linear-gradient(135deg,var(--sav),var(--sail));color:#fff}
+.mav-u{background:var(--s3);border:1px solid var(--line);color:var(--ink3)}
+.mbub{max-width:88%;padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.65;color:var(--ink)}
+.mbub-s{background:var(--s2);border:1px solid var(--line);border-top-left-radius:3px}
+.mbub-u{background:linear-gradient(135deg,var(--sav),var(--sail));color:#fff;border-top-right-radius:3px}
+.mbub b{font-weight:700}
+.msec{display:block;margin-top:7px;padding-top:7px;border-top:1px solid var(--line)}
+.mbub-u .msec{border-color:rgba(255,255,255,.25)}
+.mbdg{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.mbdg span{padding:2px 7px;border-radius:10px;font-size:9.5px;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.dot-think{display:flex;gap:3px;align-items:center;padding:4px 0}
+.da{width:6px;height:6px;border-radius:50%;background:var(--ink4);animation:dbop .9s ease-in-out infinite}
+.da:nth-child(2){animation-delay:.15s}.da:nth-child(3){animation-delay:.3s}
+@keyframes dbop{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+.chat-quick{background:var(--s2);border-top:1px solid var(--line);padding:.625rem 1.125rem;display:flex;gap:5px;flex-wrap:wrap}
+.cq{padding:4px 10px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink3);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.cq:hover{background:var(--s3);color:var(--ink);border-color:#bbb}
+.chat-irow{display:flex;gap:7px;align-items:flex-end;background:var(--s2);border-top:1px solid var(--line);padding:.875rem 1.125rem}
+.chat-ta{flex:1;border-radius:9px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:'Inter',sans-serif;font-size:12.5px;padding:8px 12px;resize:none;min-height:40px;max-height:90px;line-height:1.5;outline:none;transition:border .15s}
+.chat-ta:focus{border-color:var(--sav)}
+.chat-ta::placeholder{color:var(--ink4)}
+.sbtn{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--sav),var(--sail));border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.sbtn:hover{opacity:.85}
+.chat-hint{font-size:10px;color:var(--ink4);text-align:center;padding:.375rem;background:var(--s2);border-top:1px solid var(--line)}
+
+/* FOOTER */
+.footer{text-align:center;font-size:10.5px;color:var(--ink4);margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--line)}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:1rem}
+.search-input{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:9px 12px 9px 36px;font-size:13px;color:var(--ink);background:var(--surface);font-family:'Inter',sans-serif;outline:none;transition:border .15s}
+.search-input:focus{border-color:var(--sav)}
+.search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink4)}
+.search-ico svg{width:15px;height:15px}
+
+/* FILTER PILLS */
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1rem}
+.fpill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink3);transition:all .15s;user-select:none}
+.fpill:hover{color:var(--ink);border-color:#bbb}
+.fpill.on{background:var(--ink);color:#fff;border-color:transparent}
+
+@media(max-width:700px){
+  .g3,.stats{grid-template-columns:1fr 1fr}
+  .arch-wrap{flex-wrap:wrap}
+  .jml{flex-wrap:wrap}
+  .js{border-radius:7px!important;border!:1px solid var(--line)!important}
+  .sz-grid,.tl-grid,.score-criteria .sc-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tlogo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  </div>
+  <div>
+    <div class="tname">Identity Security Platform</div>
+    <div class="tsub">Saviynt · SailPoint · Okta — Enterprise platform intelligence</div>
+  </div>
+  <div class="pswitch">
+    <span class="pp pp-sav on" onclick="setP('sav',this)">Saviynt</span>
+    <span class="pp pp-sail" onclick="setP('sail',this)">SailPoint</span>
+    <span class="pp pp-okta" onclick="setP('okta',this)">Okta</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-bar" id="sb0"></div><div class="sval" id="sv0">IGA + PAM</div><div class="slbl">Platform type</div><div class="ssub" id="ss0" style="color:var(--sav)">Unified platform</div></div>
+  <div class="stat"><div class="stat-bar" id="sb1"></div><div class="sval" id="sv1">2010</div><div class="slbl">Founded</div><div class="ssub" id="ss1" style="color:var(--ink3)">El Segundo, CA</div></div>
+  <div class="stat"><div class="stat-bar" id="sb2"></div><div class="sval" id="sv2">200+</div><div class="slbl">Connectors</div><div class="ssub" id="ss2" style="color:var(--ink3)">Pre-built integrations</div></div>
+  <div class="stat"><div class="stat-bar" id="sb3"></div><div class="sval" id="sv3">PAM native</div><div class="slbl">Key differentiator</div><div class="ssub" id="ss3" style="color:var(--sav)">Unique in market</div></div>
+</div>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <div class="nt on" onclick="showTab('overview',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+  <div class="nt" onclick="showTab('arch',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M12 7v4M9 13H5a2 2 0 0 0 0 4h4M15 13h4a2 2 0 0 1 0 4h-4"/><circle cx="9" cy="19" r="2"/><circle cx="15" cy="19" r="2"/></svg>Architecture</div>
+  <div class="nt" onclick="showTab('flow',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Process flow</div>
+  <div class="nt" onclick="showTab('compare',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/><line x1="15" y1="9" x2="15" y2="21"/></svg>Compare all 3</div>
+  <div class="nt" onclick="showTab('jml',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>JML lifecycle</div>
+  <div class="nt" onclick="showTab('tools',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Decision tools</div>
+  <div class="nt" onclick="showTab('usecases',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Use cases</div>
+  <div class="nt" onclick="showTab('qanda',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Q&amp;A</div>
+</div>
+
+<!-- ══ OVERVIEW ══ -->
+<div id="pane-overview" class="pane on">
+  <div class="g3">
+    <div class="card">
+      <div class="ch"><div class="av" id="ov1" style="background:linear-gradient(135deg,#5548C8,#7066d8)">S</div><div><div class="ct" id="ov-name">Saviynt</div><div class="cs" id="ov-tag">Intelligent identity. Smarter security.</div></div></div>
+      <div class="cb" id="ov-desc">Unifies IGA, PAM, and Cloud Security on one platform. Risk intelligence native with scoring, anomaly detection, and automated remediation. Best for enterprises wanting one vendor for governance, privileged access, and cloud entitlements.</div>
+      <div class="chips" id="ov-chips"><span class="chip cp">IGA</span><span class="chip cp">PAM</span><span class="chip cp">CIEM</span><span class="chip cp">Risk intelligence</span></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="av" id="ov2" style="background:linear-gradient(135deg,#5548C8,#7066d8)">S</div><div><div class="ct">Platform mission</div><div class="cs">Core philosophy</div></div></div>
+      <div class="cb" style="font-style:italic;line-height:1.8;font-size:12.5px" id="ov-mission">"Secure and govern every identity. Enable businesses to innovate with confidence."</div>
+      <div style="font-size:11px;color:var(--ink4);margin-top:10px;font-weight:500" id="ov-tl2">One Identity. Unlimited Possibilities.</div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="av" style="background:linear-gradient(135deg,#0F5FC2,#2d7de0)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div><div class="ct">Capability strengths</div><div class="cs">Relative ratings</div></div></div>
+      <div id="ov-bars" style="margin-top:6px">
+        <div class="br"><span class="bl">Governance</span><div class="bt"><div class="bf bf-sav" style="width:0%"></div></div><span class="bp">90%</span></div>
+        <div class="br"><span class="bl">PAM</span><div class="bt"><div class="bf bf-sav" style="width:0%"></div></div><span class="bp">85%</span></div>
+        <div class="br"><span class="bl">Cloud / CIEM</span><div class="bt"><div class="bf bf-sav" style="width:0%"></div></div><span class="bp">88%</span></div>
+        <div class="br"><span class="bl">Risk intelligence</span><div class="bt"><div class="bf bf-sav" style="width:0%"></div></div><span class="bp">88%</span></div>
+        <div class="br"><span class="bl">Authentication</span><div class="bt"><div class="bf bf-sav" style="width:0%"></div></div><span class="bp">35%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sbox">
+    <div class="sblbl" id="ov-bentitle">Saviynt — key benefits</div>
+    <div class="g3" id="ov-benefits" style="margin-bottom:0">
+      <div class="cap"><div class="cap-t">Unified platform</div><div class="cap-s">IGA, PAM, and cloud security in one product — fewer vendors and integrations</div></div>
+      <div class="cap"><div class="cap-t">Native risk intelligence</div><div class="cap-s">Continuous scoring, anomaly detection, and automated remediation</div></div>
+      <div class="cap"><div class="cap-t">Cloud-ready CIEM</div><div class="cap-s">Govern AWS, Azure, and GCP entitlements natively without extra tools</div></div>
+      <div class="cap"><div class="cap-t">Native PAM</div><div class="cap-s">Privileged access built-in — no CyberArk or BeyondTrust purchase needed</div></div>
+      <div class="cap"><div class="cap-t">Compliance automation</div><div class="cap-s">Pre-built controls and reports for SOX, HIPAA, and ISO 27001</div></div>
+      <div class="cap"><div class="cap-t">Operational efficiency</div><div class="cap-s">Automated JML workflows eliminate manual provisioning overhead</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ARCHITECTURE ══ -->
+<div id="pane-arch" class="pane">
+  <div class="sbox">
+    <div class="sblbl" id="arch-lbl">Saviynt — identity security platform architecture</div>
+    <div class="arch-wrap">
+      <div class="src-col">
+        <div class="src-lbl">Identity sources</div>
+        <div class="src-item">HR Systems<br><span>Workday, SAP HR, Oracle HCM</span></div>
+        <div class="src-item">Directories<br><span>AD, LDAP, Entra ID</span></div>
+        <div class="src-item">Cloud identity<br><span>AWS IAM, Azure AD, Okta</span></div>
+        <div class="src-item">Databases<br><span>Oracle, SQL Server, MySQL</span></div>
+        <div class="src-item">Applications<br><span>Enterprise &amp; custom apps</span></div>
+      </div>
+      <div class="arch-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      <div style="flex:1">
+        <div class="plat-banner bg-sav" id="arch-banner">Saviynt Identity Security Platform</div>
+        <div class="caps" id="arch-caps">
+          <div class="cap"><div class="cap-t">IGA</div><div class="cap-s">Full identity lifecycle, policy-driven governance</div></div>
+          <div class="cap"><div class="cap-t">PAM</div><div class="cap-s">Privileged session mgmt, vaulting, JIT access</div></div>
+          <div class="cap"><div class="cap-t">Cloud IEM</div><div class="cap-s">Multi-cloud entitlement discovery and governance</div></div>
+          <div class="cap"><div class="cap-t">Access workflow</div><div class="cap-s">Intelligent approvals and fulfilment</div></div>
+          <div class="cap"><div class="cap-t">Risk intelligence</div><div class="cap-s">Real-time scoring and anomaly detection</div></div>
+          <div class="cap"><div class="cap-t">Compliance</div><div class="cap-s">Comprehensive audit trails and reporting</div></div>
+        </div>
+        <div class="lay lay-a" id="arch-l1">Risk intelligence layer — Access risk scoring · Behavior analytics · Anomaly detection · Automated remediation</div>
+        <div class="lay lay-s" id="arch-l2" style="margin-top:5px">Platform services — Policy engine · Workflow engine · Connectors · Reporting · APIs</div>
+        <div class="lay lay-s" style="margin-top:5px">Provisioning layer — Out-of-box connectors · REST APIs · Custom connectors · Agents</div>
+        <div style="margin-top:7px;text-align:center;font-size:11px;color:var(--ink3);padding:7px;background:var(--surface);border-radius:6px;border:1px solid var(--line);font-weight:500">Approvers &amp; managers — Business owners · Security teams · Managers · Helpdesk</div>
+      </div>
+      <div class="arch-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      <div class="src-col">
+        <div class="src-lbl">Target systems</div>
+        <div class="src-item">Applications<br><span>SAP, Salesforce, M365</span></div>
+        <div class="src-item">Cloud platforms<br><span>AWS, Azure, GCP, IBM</span></div>
+        <div class="src-item">Databases<br><span>Oracle, SQL Server, MySQL</span></div>
+        <div class="src-item">Infrastructure<br><span>Linux, Windows, Unix</span></div>
+        <div class="src-item">APIs &amp; Services<br><span>REST, Microservices</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card" style="border-left:3px solid var(--green)">
+      <div class="ch"><div class="av" style="background:var(--green-bg)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00875A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="ct">What it does well</div></div></div>
+      <div class="cb" id="arch-good">Unifies IGA + PAM + CIEM in one platform. Risk intelligence native. Best for cloud-heavy enterprises. No separate privileged access tool required.</div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--amber)">
+      <div class="ch"><div class="av" style="background:var(--amber-bg)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="ct">Points to consider</div></div></div>
+      <div class="cb" id="arch-watch">Newer entrant vs SailPoint in deeply regulated markets. PAM + IGA combined scope increases implementation complexity. Plan for phased rollout.</div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--sail)">
+      <div class="ch"><div class="av" style="background:var(--sail-l)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0F5FC2" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="ct">Best suited for</div></div></div>
+      <div class="cb" id="arch-best">Mid to large enterprises needing IGA + PAM from one vendor. Cloud-heavy organisations. Healthcare, financial services, manufacturing.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FLOW ══ -->
+<div id="pane-flow" class="pane">
+  <div class="sbox">
+    <div class="sblbl" id="flow-lbl">Saviynt — access request and provisioning flow</div>
+    <div id="flow-steps">
+      <div class="fstep"><div class="fnum" id="fn1" style="background:linear-gradient(135deg,var(--sav),var(--sav-m))">1</div><div class="fbox"><div class="fbox-t">HR trigger or access request</div><div class="fbox-s">New joiner event fires from Workday or SAP HR, or a user submits a request via the self-service portal</div></div></div>
+      <div class="fdash"></div>
+      <div class="fstep"><div class="fnum" id="fn2" style="background:linear-gradient(135deg,var(--sav),var(--sav-m))">2</div><div class="fbox"><div class="fbox-t" id="fs2">Risk intelligence check</div><div class="fbox-s" id="fs2b">Real-time risk score calculated. SoD conflicts detected. Anomaly patterns evaluated automatically against active policies.</div></div></div>
+      <div class="fdash"></div>
+      <div class="fstep"><div class="fnum" id="fn3" style="background:linear-gradient(135deg,var(--sav),var(--sav-m))">3</div><div class="fbox"><div class="fbox-t" id="fs3">Approval workflow</div><div class="fbox-s" id="fs3b">Intelligent routing to manager, business owner, or security team based on risk level and policy rules.</div></div></div>
+      <div class="fdash"></div>
+      <div class="fstep"><div class="fnum" id="fn4" style="background:linear-gradient(135deg,var(--sav),var(--sav-m))">4</div><div class="fbox"><div class="fbox-t" id="fs4">Automated provisioning</div><div class="fbox-s" id="fs4b">Access granted and pushed to all target systems — Active Directory, SAP, Salesforce, cloud platforms simultaneously.</div></div></div>
+      <div class="fdash"></div>
+      <div class="fstep"><div style="width:26px;height:26px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00875A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="fbox" style="border-color:#9FE1CB"><div class="fbox-t" style="color:var(--green)">Access active — continuously monitored</div><div class="fbox-s">Behavior analytics running. Periodic certifications scheduled. Automated remediation on policy violations.</div></div></div>
+    </div>
+  </div>
+  <div class="sbox">
+    <div class="sblbl">Leaver and de-provisioning — applies across all platforms</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <div class="cap" style="flex:1;min-width:100px"><div class="cap-t">HR termination event</div><div class="cap-s">Last working day from HRIS</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink4)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="cap" style="flex:1;min-width:100px"><div class="cap-t">Account disabled</div><div class="cap-s">Locked across all systems immediately</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink4)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="cap" style="flex:1;min-width:100px"><div class="cap-t">Entitlements revoked</div><div class="cap-s">All apps, groups, roles removed</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink4)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="cap" style="flex:1;min-width:100px"><div class="cap-t">Audit trail created</div><div class="cap-s">Full log: what, when, by whom</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPARE ══ -->
+<div id="pane-compare" class="pane">
+  <div class="search-wrap">
+    <div class="search-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+    <input class="search-input" id="matrix-search" placeholder="Filter capabilities — try SoD, PAM, cloud, certifications..." oninput="filterMatrix(this.value)">
+  </div>
+  <div class="matrix" id="matrix-table">
+    <div class="mh"><div>Capability</div><div>Saviynt</div><div>SailPoint</div><div>Okta</div></div>
+    <div class="mr" data-tags="type platform"><div>Platform type</div><div>IGA + PAM + Cloud Sec</div><div>IGA specialist</div><div>Authentication / SSO</div></div>
+    <div class="mr" data-tags="jml lifecycle identity joiner mover leaver"><div>Identity lifecycle (JML)</div><div class="ok">✓ Full automation</div><div class="ok">✓ Industry-leading</div><div class="wn">~ Basic only</div></div>
+    <div class="mr" data-tags="certifications access review recertify"><div>Access certifications</div><div class="ok">✓ Built-in</div><div class="ok">✓ Best-in-class</div><div class="no">✗ Not native</div></div>
+    <div class="mr" data-tags="role management mining"><div>Role management</div><div class="ok">✓ With risk intelligence</div><div class="ok">✓ Best-in-class mining</div><div class="wn">~ Groups only</div></div>
+    <div class="mr" data-tags="sod segregation duties policy controls"><div>SoD controls</div><div class="ok">✓ Risk-based engine</div><div class="ok">✓ Dedicated module</div><div class="no">✗ Not included</div></div>
+    <div class="mr" data-tags="pam privileged access management vaulting"><div>PAM</div><div class="ok">✓ Native PAM</div><div class="wn">~ Via 3rd party</div><div class="no">✗ Not included</div></div>
+    <div class="mr" data-tags="sso mfa single sign on authentication"><div>SSO / MFA</div><div class="wn">~ Via integrations</div><div class="wn">~ Via integrations</div><div class="ok">✓ Core capability</div></div>
+    <div class="mr" data-tags="passwordless authentication passkey"><div>Passwordless auth</div><div class="wn">~ Via integrations</div><div class="wn">~ Via integrations</div><div class="ok">✓ Native</div></div>
+    <div class="mr" data-tags="risk intelligence analytics anomaly detection"><div>Risk intelligence</div><div class="ok">✓ Native layer</div><div class="ok">✓ Identity module</div><div class="wn">~ Auth risk only</div></div>
+    <div class="mr" data-tags="cloud ciem entitlement aws azure gcp"><div>Cloud / CIEM</div><div class="ok">✓ Native CIEM</div><div class="wn">~ Add-on module</div><div class="no">✗ Not included</div></div>
+    <div class="mr" data-tags="compliance audit sox hipaa reporting"><div>Compliance &amp; audit</div><div class="ok">✓ Built-in reports</div><div class="ok">✓ Full audit trails</div><div class="wn">~ Basic logging</div></div>
+    <div class="mr" data-tags="deployment cloud saas on-prem on premise"><div>Deployment model</div><div>Cloud SaaS</div><div>Cloud + On-prem</div><div>Cloud SaaS only</div></div>
+    <div class="mr" data-tags="size org organisation enterprise"><div>Best org size</div><div>Mid to enterprise</div><div>Large enterprise</div><div>All sizes</div></div>
+  </div>
+  <div class="legend"><span class="ok">✓</span> Native capability &nbsp;&nbsp; <span class="wn">~</span> Partial or via integration &nbsp;&nbsp; <span class="no">✗</span> Not available</div>
+  <div class="g3">
+    <div class="card"><div class="ch"><div class="av" style="background:linear-gradient(135deg,#5548C8,#7066d8)">S</div><div><div class="ct">Saviynt</div><div class="cs">Relative strengths</div></div></div>
+      <div class="br"><span class="bl">Governance</span><div class="bt"><div class="bf bf-sav" style="width:90%"></div></div><span class="bp">90%</span></div>
+      <div class="br"><span class="bl">PAM</span><div class="bt"><div class="bf bf-sav" style="width:85%"></div></div><span class="bp">85%</span></div>
+      <div class="br"><span class="bl">Cloud / CIEM</span><div class="bt"><div class="bf bf-sav" style="width:88%"></div></div><span class="bp">88%</span></div>
+      <div class="br"><span class="bl">Risk intelligence</span><div class="bt"><div class="bf bf-sav" style="width:88%"></div></div><span class="bp">88%</span></div>
+      <div class="br"><span class="bl">Authentication</span><div class="bt"><div class="bf bf-sav" style="width:35%"></div></div><span class="bp">35%</span></div>
+    </div>
+    <div class="card"><div class="ch"><div class="av" style="background:linear-gradient(135deg,#0F5FC2,#2d7de0)">SP</div><div><div class="ct">SailPoint</div><div class="cs">Relative strengths</div></div></div>
+      <div class="br"><span class="bl">Governance</span><div class="bt"><div class="bf bf-sail" style="width:95%"></div></div><span class="bp">95%</span></div>
+      <div class="br"><span class="bl">Role mining</span><div class="bt"><div class="bf bf-sail" style="width:95%"></div></div><span class="bp">95%</span></div>
+      <div class="br"><span class="bl">SoD controls</span><div class="bt"><div class="bf bf-sail" style="width:92%"></div></div><span class="bp">92%</span></div>
+      <div class="br"><span class="bl">Risk intelligence</span><div class="bt"><div class="bf bf-sail" style="width:82%"></div></div><span class="bp">82%</span></div>
+      <div class="br"><span class="bl">Authentication</span><div class="bt"><div class="bf bf-sail" style="width:35%"></div></div><span class="bp">35%</span></div>
+    </div>
+    <div class="card"><div class="ch"><div class="av" style="background:linear-gradient(135deg,#003087,#1a50a8)">O</div><div><div class="ct">Okta</div><div class="cs">Relative strengths</div></div></div>
+      <div class="br"><span class="bl">Authentication / SSO</span><div class="bt"><div class="bf bf-okta" style="width:97%"></div></div><span class="bp">97%</span></div>
+      <div class="br"><span class="bl">MFA / Zero Trust</span><div class="bt"><div class="bf bf-okta" style="width:95%"></div></div><span class="bp">95%</span></div>
+      <div class="br"><span class="bl">Developer APIs</span><div class="bt"><div class="bf bf-okta" style="width:90%"></div></div><span class="bp">90%</span></div>
+      <div class="br"><span class="bl">Governance</span><div class="bt"><div class="bf bf-okta" style="width:35%"></div></div><span class="bp">35%</span></div>
+      <div class="br"><span class="bl">PAM</span><div class="bt"><div class="bf bf-okta" style="width:15%"></div></div><span class="bp">15%</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ JML ══ -->
+<div id="pane-jml" class="pane">
+  <div class="sbox">
+    <div class="sblbl">Joiner · Mover · Leaver — complete identity lifecycle</div>
+    <div class="jml">
+      <div class="js"><div class="ji">👤</div><div class="jl">Joiner</div><div class="jss">New employee hired</div><div class="jarr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="js"><div class="ji">✅</div><div class="jl">Day 1 provisioning</div><div class="jss">Accounts and access created</div><div class="jarr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="js"><div class="ji">🔄</div><div class="jl">Mover</div><div class="jss">Role or department change</div><div class="jarr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="js"><div class="ji">⚙️</div><div class="jl">Access adjusted</div><div class="jss">Old removed, new granted</div><div class="jarr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="js"><div class="ji">🚪</div><div class="jl">Leaver</div><div class="jss">Resignation or termination</div><div class="jarr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="js"><div class="ji">🔒</div><div class="jl">All access revoked</div><div class="jss">Immediate and automated</div></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="ch"><div class="av" style="background:linear-gradient(135deg,#5548C8,#7066d8)">S</div><div><div class="ct">Saviynt JML</div></div></div><div class="cb">JML extends into PAM — privileged accounts revoked in the same workflow. Cloud identity cleanup across AWS IAM and Azure AD roles happens automatically. One flow covers IGA, PAM, and cloud entitlements together.</div></div>
+    <div class="card"><div class="ch"><div class="av" style="background:linear-gradient(135deg,#0F5FC2,#2d7de0)">SP</div><div><div class="ct">SailPoint JML</div></div></div><div class="cb">The most mature JML engine in the industry. Triggered by Workday, SAP HR, or Oracle HCM events. Leaver process triggers immediate account disable and revocation across all 200+ connected systems simultaneously.</div></div>
+    <div class="card"><div class="ch"><div class="av" style="background:linear-gradient(135deg,#003087,#1a50a8)">O</div><div><div class="ct">Okta lifecycle</div></div></div><div class="cb">Excellent for SaaS app lifecycle — auto-provisions Salesforce, Slack, and Google Workspace on joining; deprovisions on leaving. Works best when paired with an IGA platform for complex ERP entitlements.</div></div>
+  </div>
+</div>
+
+<!-- ══ DECISION TOOLS ══ -->
+<div id="pane-tools" class="pane">
+
+  <!-- TOOL 1: PLATFORM SELECTOR -->
+  <div class="tool-wrap">
+    <div class="tool-header" onclick="toggleTool('t1')">
+      <div class="tool-icon" style="background:var(--sav-l)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--sav)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div><div class="tool-title">Platform selection guide</div><div class="tool-sub">Answer a few questions and get a tailored recommendation</div></div>
+      <div class="tool-toggle" id="tt1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+    <div class="tool-body open" id="tb1">
+      <div class="sz-grid">
+        <div class="sz-field">
+          <label>Organisation size</label>
+          <select id="org-size">
+            <option value="">Select size...</option>
+            <option value="small">Under 500 employees</option>
+            <option value="mid">500 – 5,000 employees</option>
+            <option value="large">5,000 – 50,000 employees</option>
+            <option value="enterprise">50,000+ employees</option>
+          </select>
+        </div>
+        <div class="sz-field">
+          <label>Primary industry</label>
+          <select id="org-industry">
+            <option value="">Select industry...</option>
+            <option value="bank">Banking / Financial services</option>
+            <option value="health">Healthcare / Life sciences</option>
+            <option value="gov">Government / Public sector</option>
+            <option value="tech">Technology / SaaS</option>
+            <option value="mfg">Manufacturing / Industrial</option>
+            <option value="retail">Retail / Consumer</option>
+          </select>
+        </div>
+        <div class="sz-field">
+          <label>Top priority</label>
+          <select id="org-priority">
+            <option value="">Select priority...</option>
+            <option value="iga">Identity governance and compliance</option>
+            <option value="pam">Privileged access management</option>
+            <option value="sso">SSO and MFA for employees</option>
+            <option value="cloud">Cloud entitlement governance</option>
+            <option value="jml">Joiner-Mover-Leaver automation</option>
+            <option value="sod">Segregation of duties controls</option>
+          </select>
+        </div>
+        <div class="sz-field">
+          <label>Deployment preference</label>
+          <select id="org-deploy">
+            <option value="">Select preference...</option>
+            <option value="cloud">Cloud SaaS only</option>
+            <option value="hybrid">Hybrid (cloud + on-prem)</option>
+            <option value="onprem">On-premises required</option>
+          </select>
+        </div>
+      </div>
+      <div class="sz-field" style="margin-bottom:.75rem">
+        <label>Number of target systems to connect</label>
+        <div class="range-row">
+          <input type="range" id="sys-count" min="1" max="100" value="20" oninput="document.getElementById('sys-val').textContent=this.value+' systems'">
+          <span class="range-val" id="sys-val">20 systems</span>
+        </div>
+      </div>
+      <button class="rec-btn" onclick="getRecommendation()">Get platform recommendation →</button>
+      <div class="rec-result" id="rec-result"></div>
+    </div>
+  </div>
+
+  <!-- TOOL 2: IMPLEMENTATION TIMELINE -->
+  <div class="tool-wrap">
+    <div class="tool-header" onclick="toggleTool('t2')">
+      <div class="tool-icon" style="background:var(--sail-l)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--sail)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div><div class="tool-title">Implementation timeline estimator</div><div class="tool-sub">See realistic rollout timelines based on your scope</div></div>
+      <div class="tool-toggle" id="tt2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+    <div class="tool-body" id="tb2">
+      <div class="sz-grid" style="margin-bottom:.75rem">
+        <div class="sz-field">
+          <label>Deployment scope</label>
+          <select id="tl-scope" onchange="calcTimeline()">
+            <option value="phase1">Phase 1 — Core IGA and top applications</option>
+            <option value="full">Full deployment — all capabilities</option>
+            <option value="enterprise">Enterprise — complex role model + SoD</option>
+          </select>
+        </div>
+        <div class="sz-field">
+          <label>Apps to connect</label>
+          <div class="range-row">
+            <input type="range" id="tl-apps" min="5" max="200" value="25" oninput="document.getElementById('tl-apps-val').textContent=this.value+' apps';calcTimeline()">
+            <span class="range-val" id="tl-apps-val">25 apps</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-grid" id="tl-grid">
+        <div class="tl-phase">
+          <div class="tl-plat" style="color:var(--okta)">Okta</div>
+          <div class="tl-bar-wrap"><div class="tl-bar-lbl">Phase 1 rollout</div><div class="tl-bar-track"><div class="tl-bar-fill" id="tl-okta" style="width:0%;background:linear-gradient(90deg,var(--okta),var(--okta-m))"></div></div></div>
+          <div class="tl-month" id="tl-okta-lbl" style="color:var(--okta)">—</div>
+        </div>
+        <div class="tl-phase">
+          <div class="tl-plat" style="color:var(--sail)">SailPoint IdentityNow</div>
+          <div class="tl-bar-wrap"><div class="tl-bar-lbl">Phase 1 rollout</div><div class="tl-bar-track"><div class="tl-bar-fill" id="tl-sail" style="width:0%;background:linear-gradient(90deg,var(--sail),var(--sail-m))"></div></div></div>
+          <div class="tl-month" id="tl-sail-lbl" style="color:var(--sail)">—</div>
+        </div>
+        <div class="tl-phase">
+          <div class="tl-plat" style="color:var(--sav)">Saviynt</div>
+          <div class="tl-bar-wrap"><div class="tl-bar-lbl">Phase 1 rollout</div><div class="tl-bar-track"><div class="tl-bar-fill" id="tl-sav" style="width:0%;background:linear-gradient(90deg,var(--sav),var(--sav-m))"></div></div></div>
+          <div class="tl-month" id="tl-sav-lbl" style="color:var(--sav)">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 3: SCORING TOOL -->
+  <div class="tool-wrap">
+    <div class="tool-header" onclick="toggleTool('t3')">
+      <div class="tool-icon" style="background:var(--okta-l)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--okta)" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+      <div><div class="tool-title">Priority scoring — pick your winner</div><div class="tool-sub">Score each capability by importance to see which platform wins for you</div></div>
+      <div class="tool-toggle" id="tt3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+    <div class="tool-body" id="tb3">
+      <p style="font-size:11.5px;color:var(--ink3);margin-bottom:12px">Select which platform you think <b>leads</b> on each capability. We'll tally and show you your winner.</p>
+      <div class="score-criteria" id="score-rows">
+        <div class="sc-row" data-cap="Identity governance"><span class="sc-lbl">Identity governance</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','Identity governance')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','Identity governance')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','Identity governance')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','Identity governance')">Equal</button></div></div>
+        <div class="sc-row" data-cap="PAM / privileged access"><span class="sc-lbl">PAM / privileged access</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','PAM / privileged access')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','PAM / privileged access')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','PAM / privileged access')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','PAM / privileged access')">Equal</button></div></div>
+        <div class="sc-row" data-cap="SSO and MFA"><span class="sc-lbl">SSO and MFA</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','SSO and MFA')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','SSO and MFA')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','SSO and MFA')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','SSO and MFA')">Equal</button></div></div>
+        <div class="sc-row" data-cap="Cloud / CIEM"><span class="sc-lbl">Cloud / CIEM</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','Cloud / CIEM')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','Cloud / CIEM')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','Cloud / CIEM')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','Cloud / CIEM')">Equal</button></div></div>
+        <div class="sc-row" data-cap="SoD controls"><span class="sc-lbl">SoD controls</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','SoD controls')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','SoD controls')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','SoD controls')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','SoD controls')">Equal</button></div></div>
+        <div class="sc-row" data-cap="JML automation"><span class="sc-lbl">JML automation</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','JML automation')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','JML automation')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','JML automation')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','JML automation')">Equal</button></div></div>
+        <div class="sc-row" data-cap="Compliance reporting"><span class="sc-lbl">Compliance reporting</span><div class="sc-opts"><button class="sc-opt" onclick="scoreClick(this,'sav','Compliance reporting')">Saviynt</button><button class="sc-opt" onclick="scoreClick(this,'sail','Compliance reporting')">SailPoint</button><button class="sc-opt" onclick="scoreClick(this,'okta','Compliance reporting')">Okta</button><button class="sc-opt" onclick="scoreClick(this,'tie','Compliance reporting')">Equal</button></div></div>
+      </div>
+      <div class="score-result" id="score-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ USE CASES ══ -->
+<div id="pane-usecases" class="pane">
+  <div class="filter-row">
+    <span class="fpill on" onclick="filterUC('all',this)">All scenarios</span>
+    <span class="fpill" onclick="filterUC('sav',this)">Saviynt wins</span>
+    <span class="fpill" onclick="filterUC('sail',this)">SailPoint wins</span>
+    <span class="fpill" onclick="filterUC('okta',this)">Okta wins</span>
+    <span class="fpill" onclick="filterUC('combo',this)">Combined stack</span>
+  </div>
+  <div class="sbox" id="uc-list">
+    <div class="uc" data-tag="sail sav">
+      <div class="uci" style="background:#E8F1FC">🏦</div>
+      <div><div class="uct">Bank with SOX compliance and SoD controls <span class="ucbdg" style="background:var(--green-bg);color:var(--green)">SailPoint or Saviynt</span></div><div class="ucb">SailPoint has the deepest SoD engine for SAP and Oracle ERP — battle-tested across hundreds of banks. Saviynt adds native PAM if admin access governance is also required. Recommended stack: Okta (SSO/MFA) + SailPoint (IGA/SoD), or Saviynt alone for IGA + PAM consolidated.</div></div>
+    </div>
+    <div class="uc" data-tag="sav">
+      <div class="uci" style="background:#FFE4E6">🏥</div>
+      <div><div class="uct">Healthcare with HIPAA and clinical PAM <span class="ucbdg" style="background:var(--green-bg);color:var(--green)">Saviynt</span></div><div class="ucb">Saviynt's native PAM governs privileged access to EHR systems (Epic, Cerner) without a separate tool. HIPAA compliance reports built-in. Okta handles clinical workforce SSO to reduce login friction for care staff while maintaining full compliance.</div></div>
+    </div>
+    <div class="uc" data-tag="sav">
+      <div class="uci" style="background:#E0F2FE">☁️</div>
+      <div><div class="uct">Cloud-heavy enterprise — AWS, Azure, and GCP <span class="ucbdg" style="background:var(--green-bg);color:var(--green)">Saviynt</span></div><div class="ucb">Saviynt's native CIEM discovers and governs IAM roles, policies, and entitlements across all cloud platforms from a single pane of glass. SailPoint requires a separate Cloud Access Management add-on. Okta manages authentication to cloud consoles.</div></div>
+    </div>
+    <div class="uc" data-tag="sail">
+      <div class="uci" style="background:#E8F1FC">🏛️</div>
+      <div><div class="uct">Government or highly regulated environment <span class="ucbdg" style="background:var(--green-bg);color:var(--green)">SailPoint</span></div><div class="ucb">SailPoint IdentityIQ (on-premises) is a preferred choice for government and defence organisations that cannot use cloud SaaS. Mature FedRAMP and compliance posture. Deepest access certification and SoD controls in the market.</div></div>
+    </div>
+    <div class="uc" data-tag="okta">
+      <div class="uci" style="background:#FEF3C7">🚀</div>
+      <div><div class="uct">Fast-growing SaaS startup under 500 people <span class="ucbdg" style="background:var(--green-bg);color:var(--green)">Okta</span></div><div class="ucb">Okta is purpose-built for SaaS-heavy organisations. Universal SSO, adaptive MFA, and lifecycle management for cloud apps get you to production in weeks. IGA platforms are overkill below 500 employees. Upgrade to SailPoint or Saviynt when SOX compliance is required.</div></div>
+    </div>
+    <div class="uc" data-tag="combo" style="border-bottom:none">
+      <div class="uci" style="background:#F3E8FF">🔗</div>
+      <div><div class="uct">Combining Okta with SailPoint or Saviynt <span class="ucbdg" style="background:var(--green-bg);color:var(--green)">Most common enterprise stack</span></div><div class="ucb">Okta handles authentication at the perimeter (SSO, MFA, session management). The IGA tool governs who should have what access (provisioning, certifications, SoD). They integrate via SCIM — provisioning events in SailPoint or Saviynt push changes to Okta automatically. These platforms complement, not compete.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q&A ══ -->
+<div id="pane-qanda" class="pane" style="padding:0">
+  <div class="chat-wrap">
+    <div class="chat-head">
+      <div class="chat-dot"></div>
+      <div class="chat-htitle">Platform Q&amp;A</div>
+      <div class="chat-hsub" id="chat-sub">All platforms · Ask anything</div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="cm">
+        <div class="mav mav-s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="mbub mbub-s"><b>Platform Q&amp;A — Saviynt · SailPoint · Okta</b><span class="msec">This section covers platform selection, architecture, JML, SoD, PAM, Zero Trust, compliance, and implementation planning. Use the quick questions below or type your own.</span><div class="mbdg"><span style="background:var(--sav-l);color:var(--sav)">Saviynt</span><span style="background:var(--sail-l);color:var(--sail)">SailPoint</span><span style="background:var(--okta-l);color:var(--okta)">Okta</span></div></div>
+      </div>
+    </div>
+    <div class="chat-quick">
+      <button class="cq" onclick="ask('What are the key differences between Saviynt and SailPoint?')">Saviynt vs SailPoint</button>
+      <button class="cq" onclick="ask('Which platform has native PAM?')">Who has native PAM?</button>
+      <button class="cq" onclick="ask('How does Okta complement SailPoint or Saviynt?')">Okta + IGA together</button>
+      <button class="cq" onclick="ask('Which platform has the strongest risk intelligence?')">Best risk intelligence</button>
+      <button class="cq" onclick="ask('Bank with SOX compliance — which platform fits best?')">Bank + SOX</button>
+      <button class="cq" onclick="ask('What are realistic implementation timelines?')">Implementation timelines</button>
+      <button class="cq" onclick="ask('How does Okta support a Zero Trust architecture?')">Okta Zero Trust</button>
+      <button class="cq" onclick="ask('How does Joiner Mover Leaver automation work?')">JML lifecycle</button>
+    </div>
+    <div class="chat-irow">
+      <textarea class="chat-ta" id="cinp" placeholder="Ask about platform selection, architecture, SoD, PAM, Zero Trust, compliance, JML, timelines..." rows="1" onkeydown="onKey(event)" oninput="autoR(this)"></textarea>
+      <button class="sbtn" onclick="sendMsg()" title="Send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+    <div class="chat-hint">Platform reference guide — Saviynt · SailPoint · Okta · 2025</div>
+  </div>
+</div>
+
+<div class="footer">Identity Security Platform · Enterprise platform intelligence · Saviynt · SailPoint · Okta · 2025</div>
+</div>
+
+<script>
+// ── PLATFORM DATA ──
+const PD = {
+  sav:{
+    grad:'linear-gradient(90deg,#5548C8,#8880e0)',
+    avGrad:'linear-gradient(135deg,#5548C8,#7066d8)',avLet:'S',
+    sv0:'IGA + PAM',ss0:'Unified platform',sc0:'var(--sav)',
+    sv1:'2010',ss1:'El Segundo, CA',
+    sv2:'200+',ss2:'Pre-built integrations',
+    sv3:'PAM native',ss3:'Unique in market',sc3:'var(--sav)',
+    name:'Saviynt',tag:'Intelligent identity. Smarter security.',
+    desc:'Unifies IGA, PAM, and Cloud Security on one platform. Risk intelligence native with scoring, anomaly detection, and automated remediation. Best for enterprises wanting one vendor for governance, privileged access, and cloud entitlements.',
+    chips:'<span class="chip cp">IGA</span><span class="chip cp">PAM</span><span class="chip cp">CIEM</span><span class="chip cp">Risk intelligence</span>',
+    mission:'"Secure and govern every identity. Enable businesses to innovate with confidence."',
+    tl2:'One Identity. Unlimited Possibilities.',
+    bars:[['Governance','90','bf-sav'],['PAM','85','bf-sav'],['Cloud / CIEM','88','bf-sav'],['Risk intelligence','88','bf-sav'],['Authentication','35','bf-sav']],
+    archBanner:'Saviynt Identity Security Platform',archBg:'bg-sav',
+    caps:[['IGA','Full identity lifecycle, policy-driven governance'],['PAM','Privileged session mgmt, vaulting, JIT access'],['Cloud IEM','Multi-cloud entitlement discovery and governance'],['Access workflow','Intelligent approvals and fulfilment'],['Risk intelligence','Real-time scoring and anomaly detection'],['Compliance','Comprehensive audit trails and reporting']],
+    l1:'Risk intelligence layer — Access risk scoring · Behavior analytics · Anomaly detection · Automated remediation',
+    l2:'Platform services — Policy engine · Workflow engine · Connectors · Reporting · APIs',
+    archGood:'Unifies IGA + PAM + CIEM in one platform. Risk intelligence native. Best for cloud-heavy enterprises. No separate privileged access tool required.',
+    archWatch:'Newer entrant vs SailPoint in deeply regulated markets. PAM + IGA combined scope can increase implementation complexity. Plan phased rollout.',
+    archBest:'Mid to large enterprises needing IGA + PAM from one vendor. Cloud-heavy organisations. Healthcare, financial services, manufacturing.',
+    flowLabel:'Saviynt — access request and provisioning flow',
+    fnGrad:'linear-gradient(135deg,#5548C8,#8880e0)',
+    fs2:'Risk intelligence check',fs2b:'Real-time risk score calculated. SoD conflicts detected. Anomaly patterns evaluated automatically against active policies.',
+    fs3:'Approval workflow',fs3b:'Intelligent routing to manager, business owner, or security team based on risk level and policy rules.',
+    fs4:'Automated provisioning',fs4b:'Access granted and pushed to all target systems — Active Directory, SAP, Salesforce, cloud platforms simultaneously.',
+    benTitle:'Saviynt — key benefits',
+    bens:[['Unified platform','IGA, PAM, and cloud security in one product — fewer vendors and integrations'],['Native risk intelligence','Continuous scoring, anomaly detection, and automated remediation'],['Cloud-ready CIEM','Govern AWS, Azure, and GCP entitlements natively without extra tools'],['Native PAM','Privileged access built-in — no CyberArk or BeyondTrust purchase needed'],['Compliance automation','Pre-built controls and reports for SOX, HIPAA, and ISO 27001'],['Operational efficiency','Automated JML workflows eliminate manual provisioning overhead']]
+  },
+  sail:{
+    grad:'linear-gradient(90deg,#0F5FC2,#4d90e0)',
+    avGrad:'linear-gradient(135deg,#0F5FC2,#2d7de0)',avLet:'SP',
+    sv0:'IGA specialist',ss0:'Cloud and on-prem',sc0:'var(--sail)',
+    sv1:'2005',ss1:'Austin, TX',
+    sv2:'200+',ss2:'IdentityIQ and IdentityNow',
+    sv3:'Role mining',ss3:'Best-in-class SoD',sc3:'var(--sail)',
+    name:'SailPoint',tag:'Secure access. Reduce risk. Drive business forward.',
+    desc:'The enterprise standard for identity governance. Deepest role mining and SoD engine in the market. IdentityIQ (on-prem) and IdentityNow (cloud) serve large regulated organisations across financial services, healthcare, and government.',
+    chips:'<span class="chip cb2">IGA</span><span class="chip cb2">Role mining</span><span class="chip cb2">SoD controls</span><span class="chip cb2">JML automation</span>',
+    mission:'"Secure access. Reduce risk. Drive business forward."',
+    tl2:'One Identity. Unlimited Possibilities.',
+    bars:[['Governance','95','bf-sail'],['Role mining','95','bf-sail'],['SoD controls','92','bf-sail'],['Risk intelligence','82','bf-sail'],['Authentication','35','bf-sail']],
+    archBanner:'SailPoint Identity Security Cloud',archBg:'bg-sail',
+    caps:[['Lifecycle mgmt','Joiner, Mover, Leaver automation'],['Access requests','Workflow-based approval flows'],['Provisioning','Automated provisioning and deprovisioning'],['Certifications','Periodic access reviews and recertification'],['Role management','Mining, design, and SoD policy controls'],['Identity intelligence','Insights, recommendations, anomaly detection']],
+    l1:'Platform services — Dashboards · Workflow engine · IdentityIQ engine · APIs and SDKs',
+    l2:'Provisioning connectors — Out-of-box connectors · REST APIs · Custom connectors',
+    archGood:'Best-in-class role mining and SoD engine. Most mature IGA. IdentityIQ battle-tested in complex regulated environments. 200+ pre-built connectors.',
+    archWatch:'Needs separate PAM (CyberArk, BeyondTrust). No native CIEM. On-prem IdentityIQ implementations can be lengthy and resource-intensive.',
+    archBest:'Large regulated enterprises in banking, financial services, and government. Organisations with complex role structures and strict SoD requirements.',
+    flowLabel:'SailPoint — access request and certification flow',
+    fnGrad:'linear-gradient(135deg,#0F5FC2,#4d90e0)',
+    fs2:'SoD and policy check',fs2b:'Segregation of duties engine evaluates the request against all active policies. Conflicts flagged and escalated automatically.',
+    fs3:'Role-based approval routing',fs3b:'Intelligent routing based on data classification, role sensitivity, and user risk score from Identity AI.',
+    fs4:'Provisioning to target systems',fs4b:'Access pushed via 200+ pre-built connectors. SCIM for SaaS apps. Agents for on-prem and legacy systems.',
+    benTitle:'SailPoint — key benefits',
+    bens:[['Best-in-class IGA','The most mature identity governance engine in the market'],['Deep SoD controls','Preventive and detective controls for SAP, Oracle, and more'],['200+ connectors','Pre-built integrations covering all major enterprise systems'],['Identity intelligence','Intelligent access recommendations and anomaly detection'],['Flexible deployment','IdentityNow (cloud) or IdentityIQ (on-prem) to suit your environment'],['Compliance-ready','Pre-built for SOX, HIPAA, ISO 27001, and PCI DSS']]
+  },
+  okta:{
+    grad:'linear-gradient(90deg,#003087,#4d72c0)',
+    avGrad:'linear-gradient(135deg,#003087,#1a50a8)',avLet:'O',
+    sv0:'Authentication / SSO',ss0:'Cloud SaaS only',sc0:'var(--okta)',
+    sv1:'2009',ss1:'San Francisco, CA',
+    sv2:'7,000+',ss2:'App integrations',
+    sv3:'Zero Trust native',ss3:'Authentication leader',sc3:'var(--okta)',
+    name:'Okta',tag:'Secure identity. Seamless access. Everywhere.',
+    desc:'The workforce identity front door. Okta handles authentication — SSO, MFA, and passwordless — not governance. Purpose-built for Zero Trust. Commonly paired with SailPoint or Saviynt for complete identity and governance coverage.',
+    chips:'<span class="chip ct2">SSO / MFA</span><span class="chip ct2">Zero Trust</span><span class="chip ct2">Universal directory</span><span class="chip ct2">Passwordless</span>',
+    mission:'"Secure every identity. Empower every user. Protect every application."',
+    tl2:'One Identity Platform for All.',
+    bars:[['Authentication / SSO','97','bf-okta'],['MFA / Zero Trust','95','bf-okta'],['Developer APIs','90','bf-okta'],['Governance','35','bf-okta'],['PAM','15','bf-okta']],
+    archBanner:'Okta Identity Cloud',archBg:'bg-okta',
+    caps:[['Authentication','SSO · MFA · Passwordless · Social login'],['Authorization','Policies · Groups · Roles · Entitlements'],['Universal directory','Centralised identity store with profile mgmt'],['Security','ThreatInsight · Behavioral detection · Adaptive MFA'],['Platform services','API Access Mgmt · Workflow · Hooks · Events'],['Global infra','High availability · Auto-scaling · 99.99% uptime']],
+    l1:'Okta platform services — API access management · Workflow automation · Hooks · Event system',
+    l2:'Pre-built secure connectors — Active Directory · LDAP · HR systems · Databases · Custom APIs',
+    archGood:'Best-in-class SSO and MFA. 7,000+ app integrations. Fastest deployment. Excellent developer APIs. Zero Trust architecture out of the box.',
+    archWatch:'Not an IGA tool — no SoD, certifications, or role mining. No PAM. Must be paired with SailPoint or Saviynt for full governance coverage.',
+    archBest:'Organisations of all sizes needing workforce SSO and MFA. SaaS-heavy environments. Front-door authentication in an Okta + IGA enterprise stack.',
+    flowLabel:'Okta — authentication and adaptive access flow',
+    fnGrad:'linear-gradient(135deg,#003087,#1a50a8)',
+    fs2:'Adaptive risk evaluation',fs2b:'ThreatInsight checks IP reputation, device trust, location, and behavioral patterns in real time against risk policies.',
+    fs3:'Step-up authentication or block',fs3b:'High-risk signals trigger additional factors — push notification, biometrics, or hardware security key. Blocked if policy requires.',
+    fs4:'Secure session granted',fs4b:'SAML or OIDC token issued. User arrives in the application. Zero Trust policies enforced continuously throughout the session.',
+    benTitle:'Okta — key benefits',
+    bens:[['Universal SSO','Single login across all web, mobile, and desktop applications'],['Adaptive MFA','Risk-based MFA that only challenges when signals indicate elevated risk'],['7,000+ integrations','The largest app integration catalogue of any identity platform'],['Zero Trust ready','ThreatInsight, device trust, and behavioral detection built-in from day one'],['Lifecycle management','Automate SaaS app onboarding and offboarding seamlessly via SCIM'],['Open and extensible','REST APIs, SDKs, and Hooks to build and extend your identity ecosystem']]
+  }
+};
+
+// ── Q&A KNOWLEDGE ──
+const QA = [
+  {m:/differ|vs |versus|compar|saviynt.*sailpoint|sailpoint.*saviynt/i,
+   a:`<b>Saviynt vs SailPoint — the honest comparison</b><span class="msec"><b>Platform breadth:</b> Saviynt = IGA + PAM + Cloud Security in one product. SailPoint = pure IGA specialist. If privileged access management is a requirement, Saviynt eliminates the need for a separate CyberArk or BeyondTrust deployment.</span><span class="msec"><b>Where SailPoint leads:</b> Role mining, SoD controls, and access certifications. IdentityIQ is battle-tested in complex financial and regulated environments — the most mature IGA engine in the market.</span><span class="msec"><b>Where Saviynt leads:</b> Single vendor for IGA + PAM. Native CIEM for cloud entitlements across AWS, Azure, and GCP. Risk intelligence built into the core from the start, not a separate module.</span><span class="msec"><b>Bottom line:</b> Large regulated enterprises with complex role structures → SailPoint. Organisations wanting unified IGA + PAM + Cloud → Saviynt.</span>`,b:['sav','sail']},
+  {m:/pam|privileged|vault|cyberark|beyondtrust/i,
+   a:`<b>Native PAM — Saviynt is the only one of the three</b><span class="msec"><b>Saviynt:</b> Full native PAM — privileged session management, just-in-time access, credential vaulting, and session recording. No separate PAM vendor needed.</span><span class="msec"><b>SailPoint:</b> Governs privileged identities but does not vault credentials or record sessions. Customers integrate with CyberArk, BeyondTrust, or Delinea. More vendors, more complexity.</span><span class="msec"><b>Okta:</b> No PAM capabilities. Can enforce MFA on privileged accounts but is not a PAM replacement in any scenario.</span>`,b:['sav','sail']},
+  {m:/okta.*(iga|together|complement|sailpoint|saviynt|combine)|how.*okta.*fit|sso|front door/i,
+   a:`<b>Okta + IGA — the most common enterprise identity stack</b><span class="msec"><b>Okta is the front door.</b> SSO, MFA, and session management. It answers: "Is this really you?" Employees use it every morning to authenticate into their applications.</span><span class="msec"><b>IGA is the backstage manager.</b> SailPoint or Saviynt answers: "Should this person have access to this at all?" It governs provisioning, certifications, SoD, and compliance behind the scenes.</span><span class="msec"><b>Integration:</b> The IGA platform provisions and deprovisions access, pushing changes to Okta via SCIM. Okta enforces authentication at the perimeter. Neither replaces the other — they complement perfectly.</span>`,b:['okta','sail','sav']},
+  {m:/risk intel|analytic|anomal/i,
+   a:`<b>Risk intelligence — who leads?</b><span class="msec"><b>Saviynt:</b> Risk intelligence built natively into the core — Access Risk Scoring, Behavior Analytics, Anomaly Detection, Predictive Insights, and Automated Remediation as one unified layer.</span><span class="msec"><b>SailPoint:</b> Identity module in IdentityNow — peer group analysis, smart access recommendations, and anomaly detection. Strong for certification and role mining intelligence.</span><span class="msec"><b>Okta:</b> ThreatInsight and Behavioral Detection for authentication risk — impossible travel, anomalous logins, credential attacks. Authentication intelligence only, not governance.</span>`,b:['sav','sail','okta']},
+  {m:/bank|sox|sod|segregat|financial|audit|regulat/i,
+   a:`<b>Banking and SOX — platform selection</b><span class="msec"><b>SailPoint</b> has the deepest SoD engine for SAP and Oracle ERP — battle-tested across hundreds of banks. SOX audit reports are pre-built and ready to use.</span><span class="msec"><b>Saviynt</b> also handles SOX and SoD well, and adds native PAM — increasingly required to govern admin access to core banking systems. If PAM is a hard requirement, Saviynt pulls ahead.</span><span class="msec"><b>Recommended stack:</b> Okta (SSO/MFA) + SailPoint (IGA/SoD) + CyberArk if PAM is separate. Or Saviynt alone for IGA + PAM in one platform.</span>`,b:['sail','sav','okta']},
+  {m:/timeline|implement|how long|deploy|rollout/i,
+   a:`<b>Implementation timelines — realistic expectations</b><span class="msec"><b>Okta:</b> SSO and MFA for core apps — 4 to 8 weeks. Full workforce identity with lifecycle management — 3 to 6 months. Fastest of the three.</span><span class="msec"><b>SailPoint IdentityNow:</b> Phase 1 (core IGA, JML, top 10 apps) — 4 to 6 months. Full deployment with SoD and 50+ connectors — 9 to 18 months. On-prem IdentityIQ — 12 to 24 months.</span><span class="msec"><b>Saviynt:</b> Phase 1 (IGA + top apps) — 4 to 6 months. Adding PAM and Cloud Security — 2 to 4 months more. Consolidating IGA + PAM saves 3 to 6 months vs. deploying two separate tools.</span>`,b:['okta','sail','sav']},
+  {m:/health|hipaa|hospital|clinical/i,
+   a:`<b>Healthcare and HIPAA</b><span class="msec"><b>Saviynt</b> is the top recommendation. Native PAM governs EHR systems (Epic, Cerner) without a separate tool. HIPAA compliance reports built-in. CIEM covers clinical workloads in AWS or Azure.</span><span class="msec"><b>SailPoint</b> handles the governance side well — managing clinical staff access, running certifications for physicians and nurses. Needs a separate PAM tool for privileged clinical system access.</span><span class="msec"><b>Okta</b> handles clinical workforce SSO — single login across EHR, PACS, and clinical apps significantly reduces friction for care staff.</span>`,b:['sav','sail','okta']},
+  {m:/cloud|aws|azure|gcp|ciem|entitlement|multi.cloud/i,
+   a:`<b>Cloud-heavy enterprise — CIEM is critical</b><span class="msec"><b>Saviynt</b> leads with native CIEM — discovers, analyses, and governs IAM roles, policies, and entitlements across AWS, Azure, and GCP from one platform. No other major IGA tool does this natively.</span><span class="msec"><b>SailPoint</b> has a Cloud Access Management add-on that extends governance into cloud infrastructure — but it is a separate module requiring additional setup and cost.</span><span class="msec"><b>Okta</b> manages authentication to cloud consoles and apps, but not entitlements within cloud environments (IAM policies, S3 access, etc.).</span>`,b:['sav','sail','okta']},
+  {m:/zero.trust|zerotrust|threat|perimeter/i,
+   a:`<b>Zero Trust with Okta</b><span class="msec"><b>The principle:</b> Zero Trust assumes no user, device, or network is inherently trusted. Every access request is continuously verified based on identity, device health, location, and behaviour signals.</span><span class="msec"><b>Okta's toolkit:</b> Adaptive MFA based on contextual risk. Device Trust for managed-device enforcement. ThreatInsight blocks malicious IPs before authentication. Behavioural Detection flags anomalous patterns in real time.</span><span class="msec"><b>Full Zero Trust needs both layers:</b> Okta verifies identity at the door. SailPoint or Saviynt verifies that the user should have the entitlements they are requesting. Together they cover the complete Zero Trust identity pillar.</span>`,b:['okta','sail','sav']},
+  {m:/jml|joiner|mover|leaver|lifecycle|onboard|offboard/i,
+   a:`<b>Joiner-Mover-Leaver lifecycle automation</b><span class="msec"><b>Joiner:</b> HR system fires a new employee event. The platform automatically creates accounts and provisions role-based access across all connected systems. Day-one access with no helpdesk ticket.</span><span class="msec"><b>Mover:</b> Role or department change triggers automatic access adjustment. Old entitlements removed, new ones granted based on the updated role. No manual work, no access accumulation.</span><span class="msec"><b>Leaver:</b> Termination event immediately disables accounts and revokes all entitlements across every connected system. Complete audit trail created automatically. Zero orphaned accounts.</span><span class="msec">SailPoint has the most mature JML engine. Saviynt extends JML into PAM and cloud in the same flow. Okta handles JML for SaaS apps only.</span>`,b:['sail','sav','okta']}
+];
+
+// ── PLATFORM SWITCH ──
+let cur = 'sav';
+function setP(p, el) {
+  document.querySelectorAll('.pp').forEach(e => e.classList.remove('on'));
+  el.classList.add('on'); cur = p;
+  const d = PD[p];
+  // Stats
+  for (let i=0;i<4;i++) {
+    const b=document.getElementById('sb'+i), v=document.getElementById('sv'+i), s=document.getElementById('ss'+i);
+    b.style.background=d.grad;
+    v.textContent=d['sv'+i];
+    s.textContent=d['ss'+i];
+    s.style.color=i===0?d.sc0:i===3?d.sc3:'var(--ink3)';
+  }
+  // Overview
+  ['ov1','ov2'].forEach(id=>{const e=document.getElementById(id);e.style.background=d.avGrad;e.textContent=d.avLet});
+  document.getElementById('ov-name').textContent=d.name;
+  document.getElementById('ov-tag').textContent=d.tag;
+  document.getElementById('ov-desc').textContent=d.desc;
+  document.getElementById('ov-chips').innerHTML=d.chips;
+  document.getElementById('ov-mission').textContent=d.mission;
+  document.getElementById('ov-tl2').textContent=d.tl2;
+  // Bars animate
+  const cls=`bf-${p}`;
+  document.getElementById('ov-bars').innerHTML=d.bars.map(b=>`<div class="br"><span class="bl">${b[0]}</span><div class="bt"><div class="bf ${cls}" style="width:0%"></div></div><span class="bp">${b[1]}%</span></div>`).join('');
+  setTimeout(()=>{const fs=document.querySelectorAll('#ov-bars .bf');d.bars.forEach((b,i)=>{if(fs[i])fs[i].style.width=b[1]+'%'});},50);
+  document.getElementById('ov-bentitle').textContent=d.benTitle;
+  document.getElementById('ov-benefits').innerHTML=d.bens.map(b=>`<div class="cap"><div class="cap-t">${b[0]}</div><div class="cap-s">${b[1]}</div></div>`).join('');
+  // Architecture
+  document.getElementById('arch-lbl').textContent=d.name+' — identity security platform architecture';
+  const banner=document.getElementById('arch-banner');banner.textContent=d.archBanner;banner.className='plat-banner '+d.archBg;
+  document.getElementById('arch-caps').innerHTML=d.caps.map(c=>`<div class="cap"><div class="cap-t">${c[0]}</div><div class="cap-s">${c[1]}</div></div>`).join('');
+  document.getElementById('arch-l1').textContent=d.l1;
+  document.getElementById('arch-l2').textContent=d.l2;
+  document.getElementById('arch-good').textContent=d.archGood;
+  document.getElementById('arch-watch').textContent=d.archWatch;
+  document.getElementById('arch-best').textContent=d.archBest;
+  // Flow
+  document.getElementById('flow-lbl').textContent=d.flowLabel;
+  ['fn1','fn2','fn3','fn4'].forEach(id=>document.getElementById(id).style.background=d.fnGrad);
+  document.getElementById('fs2').textContent=d.fs2;document.getElementById('fs2b').textContent=d.fs2b;
+  document.getElementById('fs3').textContent=d.fs3;document.getElementById('fs3b').textContent=d.fs3b;
+  document.getElementById('fs4').textContent=d.fs4;document.getElementById('fs4b').textContent=d.fs4b;
+  // Chat sub
+  document.getElementById('chat-sub').textContent=d.name+' · Ask anything';
+}
+
+// ── TAB ──
+function showTab(id, el) {
+  document.querySelectorAll('.nt').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.pane').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('pane-'+id).classList.on;
+  document.getElementById('pane-'+id).classList.add('on');
+  if(id==='overview') setTimeout(()=>{const d=PD[cur];const fs=document.querySelectorAll('#ov-bars .bf');d.bars.forEach((b,i)=>{if(fs[i])fs[i].style.width=b[1]+'%'});},50);
+}
+
+// ── SEARCH MATRIX ──
+function filterMatrix(q) {
+  const rows = document.querySelectorAll('#matrix-table .mr');
+  const t = q.toLowerCase();
+  rows.forEach(r => {
+    const tags = (r.dataset.tags||'') + ' ' + r.textContent.toLowerCase();
+    r.style.display = (!t || tags.includes(t)) ? '' : 'none';
+  });
+}
+
+// ── USE CASE FILTER ──
+function filterUC(tag, el) {
+  document.querySelectorAll('.fpill').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('#uc-list .uc').forEach(u=>{
+    u.style.display = (tag==='all'||u.dataset.tag.includes(tag)) ? '' : 'none';
+  });
+}
+
+// ── TOOL TOGGLES ──
+function toggleTool(id) {
+  const body=document.getElementById('tb'+id.slice(1));
+  const icon=document.getElementById('tt'+id.slice(1));
+  const open=body.classList.toggle('open');
+  icon.classList.toggle('open',open);
+}
+
+// ── PLATFORM RECOMMENDATION ──
+function getRecommendation() {
+  const size=document.getElementById('org-size').value;
+  const ind=document.getElementById('org-industry').value;
+  const pri=document.getElementById('org-priority').value;
+  const dep=document.getElementById('org-deploy').value;
+  const sys=parseInt(document.getElementById('sys-count').value);
+  if(!size||!ind||!pri) { alert('Please fill in all fields to get a recommendation.'); return; }
+  let plat='',col='',why='',stack='';
+  if(pri==='sso'||size==='small'||(ind==='tech'&&size==='small')) {
+    plat='Okta'; col='var(--okta)';
+    why='For your organisation size and priority, Okta delivers the fastest time to value. Universal SSO, adaptive MFA, and SaaS lifecycle management will cover your core needs. You can layer in a full IGA platform when you scale past 500 employees or face compliance mandates.';
+    stack='<span style="background:var(--okta-l);color:var(--okta)">Okta</span>';
+  } else if(pri==='pam'||pri==='cloud'||(ind==='health'&&pri!=='sso')) {
+    plat='Saviynt'; col='var(--sav)';
+    why='Saviynt is the strongest fit for your requirements. Native PAM and CIEM eliminate the need for additional vendors — IGA, privileged access, and cloud entitlement governance all in one platform. This is especially strong for healthcare, cloud-heavy, and manufacturing environments.';
+    stack='<span style="background:var(--okta-l);color:var(--okta)">Okta</span> + <span style="background:var(--sav-l);color:var(--sav)">Saviynt</span>';
+  } else if(pri==='sod'||pri==='iga'||(ind==='bank'||ind==='gov')||(dep==='onprem'||dep==='hybrid')) {
+    plat='SailPoint'; col='var(--sail)';
+    why='SailPoint is the strongest IGA platform for your scenario. Best-in-class SoD controls, mature role mining, and battle-tested access certifications make it the preferred choice for regulated industries. IdentityIQ supports on-premises and hybrid deployments where SaaS is not an option.';
+    stack='<span style="background:var(--okta-l);color:var(--okta)">Okta</span> + <span style="background:var(--sail-l);color:var(--sail)">SailPoint</span>'+(pri==='pam'?' + CyberArk':'');
+  } else {
+    plat='SailPoint or Saviynt'; col='var(--sail)';
+    why='Both SailPoint and Saviynt are strong candidates for your requirements. If SoD and role governance are the primary concern, SailPoint leads. If you want IGA and PAM in one platform, or have heavy cloud entitlement requirements, Saviynt is the better fit.';
+    stack='<span style="background:var(--okta-l);color:var(--okta)">Okta</span> + <span style="background:var(--sail-l);color:var(--sail)">SailPoint</span> or <span style="background:var(--sav-l);color:var(--sav)">Saviynt</span>';
+  }
+  const r=document.getElementById('rec-result');
+  r.style.borderColor=col;r.style.background=col.replace('var(--','var(--').replace(')','-l)').replace('--okta-l','--okta-l').replace('--sav-l','--sav-l').replace('--sail-l','--sail-l');
+  r.innerHTML=`<div class="rec-plat" style="color:${col}">Recommended: ${plat}</div><div class="rec-why">${why}</div><div class="rec-stack" style="margin-top:8px">Typical stack: ${stack}</div>`;
+  r.style.background=col.includes('sav')?'var(--sav-l)':col.includes('sail')?'var(--sail-l)':'var(--okta-l)';
+  r.classList.add('show');
+}
+
+// ── TIMELINE ──
+function calcTimeline() {
+  const scope=document.getElementById('tl-scope').value;
+  const apps=parseInt(document.getElementById('tl-apps').value);
+  let om=0,sm=0,vm=0;
+  if(scope==='phase1'){om=apps>50?5:3;sm=apps>50?7:5;vm=apps>50?7:5;}
+  else if(scope==='full'){om=apps>50?8:6;sm=apps>50?18:12;vm=apps>50?16:10;}
+  else{om=apps>50?10:8;sm=apps>50?24:18;vm=apps>50?20:14;}
+  const max=Math.max(om,sm,vm);
+  function set(id,lbl,m){document.getElementById(id).style.width=(m/max*100)+'%';document.getElementById(lbl).textContent=m+' months';}
+  setTimeout(()=>{set('tl-okta','tl-okta-lbl',om);set('tl-sail','tl-sail-lbl',sm);set('tl-sav','tl-sav-lbl',vm);},50);
+}
+
+// ── SCORING ──
+const scores={sav:0,sail:0,okta:0};
+function scoreClick(btn,plat,cap) {
+  const row=btn.closest('.sc-row');
+  row.querySelectorAll('.sc-opt').forEach(b=>{b.classList.remove('sel','sel-sav','sel-sail','sel-okta','sel-tie')});
+  btn.classList.add('sel','sel-'+plat);
+  // Recalc
+  scores.sav=0;scores.sail=0;scores.okta=0;
+  document.querySelectorAll('.sc-opt.sel').forEach(b=>{
+    const p=b.classList.contains('sel-sav')?'sav':b.classList.contains('sel-sail')?'sail':b.classList.contains('sel-okta')?'okta':null;
+    if(p) scores[p]++;
+  });
+  showScore();
+}
+function showScore() {
+  const total=scores.sav+scores.sail+scores.okta;
+  if(total<3) return;
+  const max=Math.max(scores.sav,scores.sail,scores.okta);
+  let winner='',col='',why='';
+  if(scores.sav===max&&scores.sav>scores.sail&&scores.sav>scores.okta){winner='Saviynt';col='var(--sav)';why='Based on your selections, Saviynt aligns best with your priorities — particularly if PAM, cloud governance, and unified platform coverage are important to you.';}
+  else if(scores.sail===max&&scores.sail>scores.sav&&scores.sail>scores.okta){winner='SailPoint';col='var(--sail)';why='Based on your selections, SailPoint aligns best with your priorities — particularly strong in governance depth, SoD controls, and role management.';}
+  else if(scores.okta===max&&scores.okta>scores.sav&&scores.okta>scores.sail){winner='Okta';col='var(--okta)';why='Based on your selections, Okta aligns best with your priorities — particularly for SSO, MFA, and Zero Trust requirements.';}
+  else{winner='Tied — consider your deployment model';col='var(--ink2)';why='Your selections show strong requirements that span more than one platform. Consider a combined stack — Okta for authentication alongside SailPoint or Saviynt for governance.';}
+  const r=document.getElementById('score-result');
+  r.innerHTML=`<div class="score-winner" style="color:${col}">Your winner: ${winner}</div><div class="score-bars"><div class="score-br"><span class="score-bl">Saviynt</span><div class="score-bt"><div class="score-bf" style="width:${(scores.sav/Math.max(1,max)*100).toFixed(0)}%;background:var(--sav)"></div></div><span style="font-size:11px;color:var(--ink4);font-weight:600">${scores.sav}</span></div><div class="score-br"><span class="score-bl">SailPoint</span><div class="score-bt"><div class="score-bf" style="width:${(scores.sail/Math.max(1,max)*100).toFixed(0)}%;background:var(--sail)"></div></div><span style="font-size:11px;color:var(--ink4);font-weight:600">${scores.sail}</span></div><div class="score-br"><span class="score-bl">Okta</span><div class="score-bt"><div class="score-bf" style="width:${(scores.okta/Math.max(1,max)*100).toFixed(0)}%;background:var(--okta)"></div></div><span style="font-size:11px;color:var(--ink4);font-weight:600">${scores.okta}</span></div></div><div class="score-why">${why}</div>`;
+  r.classList.add('show');
+}
+
+// ── Q&A ──
+function ask(text) {
+  addMsg(text,'user',[]);
+  const m=QA.find(q=>q.m.test(text));
+  setTimeout(()=>{
+    if(m) addMsg(m.a,'sys',m.b||[]);
+    else addMsg(`<b>Good question.</b> This reference guide covers Saviynt, SailPoint, and Okta across the following topics:<span class="msec">Platform comparisons · PAM capabilities · Risk intelligence · JML lifecycle · SoD controls · Zero Trust · Cloud and CIEM governance · Compliance scenarios (SOX, HIPAA) · Implementation timelines · Combined platform stacks</span><span class="msec">Try using one of the quick questions above, or rephrase with keywords like <b>PAM, SoD, JML, Zero Trust, cloud, bank, healthcare,</b> or <b>timelines</b>.</span>`,'sys',[]);
+  },350);
+}
+function sendMsg(){const el=document.getElementById('cinp');const t=el.value.trim();if(!t)return;el.value='';el.style.height='auto';ask(t);}
+function addMsg(html,role,badges){
+  const chat=document.getElementById('chat-msgs');
+  const isSys=role==='sys';
+  const bMap={sav:[PD.sav.name,'var(--sav-l)','var(--sav)'],sail:[PD.sail.name,'var(--sail-l)','var(--sail)'],okta:[PD.okta.name,'var(--okta-l)','var(--okta)']};
+  const bdg=badges&&badges.length?`<div class="mbdg">${badges.map(b=>`<span style="background:${bMap[b][1]};color:${bMap[b][2]}">${bMap[b][0]}</span>`).join('')}</div>`:'';
+  const d=document.createElement('div');
+  d.className='cm'+(isSys?'':' u');
+  d.innerHTML=`<div class="mav ${isSys?'mav-s':'mav-u'}">${isSys?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}</div><div class="mbub ${isSys?'mbub-s':'mbub-u'}">${html}${isSys?bdg:''}</div>`;
+  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
+}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoR(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px';}
+
+// Init bars and timeline
+window.addEventListener('load',()=>{
+  setTimeout(()=>{const fs=document.querySelectorAll('#ov-bars .bf');PD.sav.bars.forEach((b,i)=>{if(fs[i])fs[i].style.width=b[1]+'%'});},150);
+  calcTimeline();
+});
+</script>
+</body>
+</html>
