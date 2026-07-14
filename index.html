@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identity Solution Design Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent:#4F46E5; --accent-dark:#3730A3; --accent-light:#EEF2FF;
+  --surface:#fff; --bg:#F5F6FA; --border:#E0E4F0;
+  --text:#1E1B4B; --muted:#6B7280;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+.app{display:flex;height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:300px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:16px;border-bottom:1px solid var(--border);}
+.sb-head .eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:3px;}
+.sb-head h2{font-size:14px;font-weight:700;}
+.sb-body{flex:1;overflow-y:auto;padding:14px;}
+.sb-foot{padding:14px;border-top:1px solid var(--border);}
+
+label.lbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:4px;margin-top:10px;}
+input,select{width:100%;padding:7px 9px;border:1.5px solid var(--border);border-radius:7px;font-family:inherit;font-size:12.5px;color:var(--text);background:#fff;outline:none;}
+input:focus,select:focus{border-color:var(--accent);}
+input::placeholder{color:#c0c4cf;}
+.row2{display:flex;gap:8px;}
+.row2 > *{flex:1;}
+
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.chip{padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;color:var(--muted);background:#fff;user-select:none;transition:all .12s;}
+.chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600;}
+
+.sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 6px;}
+.tpls{display:flex;flex-direction:column;gap:5px;}
+.tpl{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all .12s;}
+.tpl:hover{border-color:var(--accent);background:var(--accent-light);}
+.tpl .ico{font-size:16px;}
+.tpl strong{font-size:12px;font-weight:600;display:block;}
+.tpl span{font-size:10.5px;color:var(--muted);}
+
+.btn-gen{width:100%;padding:12px;border-radius:9px;background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.01em;transition:opacity .15s;}
+.btn-gen:hover{opacity:.9;}
+.btn-gen.busy{opacity:.6;pointer-events:none;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{padding:10px 18px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.topbar .bc{font-size:11.5px;color:var(--muted);}
+.topbar .bc strong{color:var(--text);}
+.topbar-actions{display:flex;gap:6px;}
+.tbtn{padding:5px 11px;border-radius:6px;border:1.5px solid var(--border);font-size:11.5px;font-weight:500;cursor:pointer;background:#fff;color:var(--muted);font-family:inherit;}
+.tbtn:hover{border-color:var(--accent);color:var(--accent);}
+
+.canvas{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:16px;}
+
+/* EMPTY */
+.empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;opacity:.4;}
+.empty .ei{font-size:44px;}
+.empty p{font-size:13px;color:var(--muted);}
+
+/* OUTPUT */
+#out{display:none;flex-direction:column;gap:16px;}
+
+/* ARCH DIAGRAM CARD */
+.arch{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.arch-head{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;color:#fff;}
+.arch-head h3{font-size:13px;font-weight:700;}
+.arch-head .meta{font-size:11px;opacity:.75;}
+.arch-body{padding:18px;background:#F9FAFB;}
+
+/* 3-col layout */
+.cols{display:grid;grid-template-columns:150px 1fr 148px;gap:0;min-height:300px;}
+.col-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;text-align:center;}
+
+/* Source cards */
+.src-col{padding-right:14px;}
+.src-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:8px;position:relative;}
+.src-card::after{content:'';position:absolute;right:-15px;top:50%;transform:translateY(-50%);border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #818CF8;}
+.src-card .st{font-size:11.5px;font-weight:600;}
+.src-card .ss{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* Platform box */
+.plat-box{border:2.5px solid var(--accent);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;margin:0 4px;}
+.plat-name{text-align:center;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);padding-bottom:8px;border-bottom:1px dashed rgba(79,70,229,.2);}
+.plat-users{background:rgba(79,70,229,.06);border:1px solid rgba(79,70,229,.15);border-radius:7px;padding:6px 10px;text-align:center;font-size:10.5px;color:#3730A3;font-weight:500;}
+
+/* Module grid — KEY PART */
+.mod-grid{display:grid;gap:7px;}
+.mod-grid.cols-2{grid-template-columns:1fr 1fr;}
+.mod-grid.cols-1{grid-template-columns:1fr;}
+
+.mod{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;}
+.mod.PRIMARY{border-color:var(--accent);background:var(--accent-light);}
+.mod.SECONDARY{border-color:var(--border);background:#fff;}
+.mod.GHOST{border-color:#e9ebf0;background:#f7f8fc;opacity:.6;}
+.mod .mi{font-size:14px;margin-bottom:3px;}
+.mod .mn{font-size:11.5px;font-weight:700;color:var(--text);}
+.mod.PRIMARY .mn{color:var(--accent);}
+.mod .md{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* Full-width module */
+.mod.WIDE{grid-column:1/-1;}
+
+.plat-footer{display:flex;flex-direction:column;gap:4px;margin-top:4px;padding-top:8px;border-top:1px dashed rgba(79,70,229,.2);}
+.pf{background:rgba(79,70,229,.05);border-radius:5px;padding:4px 9px;font-size:9.5px;color:#3730A3;text-align:center;font-weight:500;}
+.pf.bold{font-weight:700;background:rgba(79,70,229,.1);}
+
+/* Target cards */
+.tgt-col{padding-left:14px;}
+.tgt-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:8px;position:relative;}
+.tgt-card::before{content:'';position:absolute;left:-15px;top:50%;transform:translateY(-50%);border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:7px solid #818CF8;}
+.tgt-card .st{font-size:11.5px;font-weight:600;}
+.tgt-card .ss{font-size:10px;color:var(--muted);margin-top:2px;}
+.tgt-card .badge{display:inline-block;margin-top:3px;padding:1px 6px;background:var(--accent-light);color:var(--accent);border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;}
+
+/* INFO ROW */
+.info-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.03);}
+.card h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;}
+.rec-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;font-size:12.5px;font-weight:700;margin-bottom:8px;}
+.rec-body{font-size:11.5px;color:var(--muted);line-height:1.6;}
+.phase{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.pnum{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pinfo strong{font-size:11.5px;font-weight:600;display:block;}
+.pinfo span{font-size:10.5px;color:var(--muted);}
+.pdur{margin-left:auto;font-size:10px;font-weight:700;color:var(--accent);padding-top:2px;white-space:nowrap;}
+.risk{display:flex;gap:7px;margin-bottom:7px;align-items:flex-start;}
+.rdot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.rtxt{font-size:11px;color:var(--muted);line-height:1.5;}
+.spec-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.spec-tbl tr{border-bottom:1px solid var(--border);}
+.spec-tbl tr:last-child{border-bottom:none;}
+.spec-tbl td{padding:6px 8px;}
+.spec-tbl td:first-child{color:var(--muted);font-weight:600;width:36%;}
+
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.a0{animation:up .3s ease both;}
+.a1{animation:up .3s .08s ease both;}
+.a2{animation:up .3s .16s ease both;}
+.a3{animation:up .3s .24s ease both;}
+
+/* ── LOGIN SCREEN ── */
+#loginScreen{
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1E1B4B 0%,#312E81 40%,#4C1D95 100%);
+  overflow:hidden;
+}
+#loginScreen::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.login-box{
+  background:#fff;border-radius:16px;padding:40px 36px;
+  width:400px;max-width:90vw;position:relative;z-index:1;
+  box-shadow:0 24px 60px rgba(0,0,0,.35);
+  animation:up .4s ease both;
+}
+.login-logo{
+  display:flex;align-items:center;gap:10px;margin-bottom:28px;
+}
+.login-logo .licon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,#4F46E5,#7C3AED);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.login-logo .ltitle{font-size:16px;font-weight:800;color:#1E1B4B;line-height:1.2;}
+.login-logo .lsub{font-size:11px;color:var(--muted);font-weight:500;}
+.login-box h2{font-size:22px;font-weight:800;color:#1E1B4B;margin-bottom:4px;}
+.login-box .login-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.login-field{margin-bottom:14px;}
+.login-field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px;}
+.login-field input{
+  width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;
+  font-family:inherit;font-size:13.5px;color:var(--text);outline:none;transition:border-color .15s;
+}
+.login-field input:focus{border-color:#4F46E5;box-shadow:0 0 0 3px rgba(79,70,229,.1);}
+.login-field input::placeholder{color:#b0b7c3;}
+.login-error{
+  display:none;color:#EF4444;font-size:12px;font-weight:500;
+  margin-bottom:12px;padding:8px 12px;background:#FEF2F2;
+  border-radius:7px;border:1px solid #FECACA;
+}
+.login-error.show{display:block;}
+.btn-login{
+  width:100%;padding:13px;border-radius:9px;
+  background:linear-gradient(135deg,#4F46E5,#7C3AED);
+  color:#fff;border:none;font-family:inherit;
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:opacity .15s,transform .1s;margin-top:4px;
+  letter-spacing:.01em;
+}
+.btn-login:hover{opacity:.92;}
+.btn-login:active{transform:scale(.98);}
+.login-footer{
+  margin-top:20px;text-align:center;
+  font-size:11px;color:#b0b7c3;
+}
+.login-hint{
+  margin-top:16px;padding:10px 13px;
+  background:var(--accent-light);border-radius:8px;
+  font-size:11.5px;color:#4F46E5;font-weight:500;
+  display:flex;align-items:center;gap:6px;
+}
+.login-hint .hkey{font-family:monospace;font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="licon">🔐</div>
+      <div>
+        <div class="ltitle">Identity Studio</div>
+        <div class="lsub">Solution Design Platform</div>
+      </div>
+    </div>
+    <h2>Welcome back</h2>
+    <p class="login-sub">Sign in to access the Identity Solution Design Studio</p>
+    <div class="login-field">
+      <label>Username</label>
+      <input id="loginUser" type="text" placeholder="Enter your username" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input id="loginPass" type="password" placeholder="Enter your password" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="loginError">❌ Invalid username or password. Please try again.</div>
+    <button class="btn-login" onclick="doLogin()">Sign in →</button>
+
+    <div class="login-footer">© 2026 Identity Studio · Powered by Saviynt / SailPoint / Okta</div>
+  </div>
+</div>
+
+<div class="app" id="mainApp" style="display:none">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="eyebrow">Identity Studio</div>
+    <h2>Customer requirements</h2>
+  </div>
+  <div class="sb-body">
+    <label class="lbl">Customer name</label>
+    <input id="iName" placeholder="e.g. SBI, Infosys…">
+
+    <div class="row2" style="margin-top:10px">
+      <div>
+        <label class="lbl">Industry</label>
+        <select id="iIndustry">
+          <option value="">Select…</option>
+          <option>Banking / BFSI</option>
+          <option>Healthcare</option>
+          <option>Government</option>
+          <option>Retail / E-commerce</option>
+          <option>Manufacturing</option>
+          <option>Technology / SaaS</option>
+          <option>Insurance</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl">Size</label>
+        <select id="iSize">
+          <option value="">Select…</option>
+          <option>1–1,000</option>
+          <option>1,000–10,000</option>
+          <option>10,000–50,000</option>
+          <option>50,000+</option>
+        </select>
+      </div>
+    </div>
+
+    <label class="lbl">Identity sources</label>
+    <input id="iSources" placeholder="SAP HR, AD, Workday…">
+
+    <label class="lbl">Platform preference</label>
+    <select id="iPlatform">
+      <option value="">Auto-recommend</option>
+      <option>Saviynt</option>
+      <option>SailPoint</option>
+      <option>Okta + SailPoint</option>
+      <option>Microsoft Entra</option>
+    </select>
+
+    <div class="sec">Capabilities required</div>
+    <div class="chips" id="chipBox">
+      <div class="chip on" data-v="IGA">IGA</div>
+      <div class="chip" data-v="PAM">PAM</div>
+      <div class="chip" data-v="SoD">SoD / Compliance</div>
+      <div class="chip" data-v="SSO">SSO / MFA</div>
+      <div class="chip" data-v="CIEM">CIEM</div>
+      <div class="chip" data-v="Cert">Certifications</div>
+      <div class="chip" data-v="JML">JML Lifecycle</div>
+      <div class="chip" data-v="Risk">Risk Analytics</div>
+    </div>
+
+    <div class="sec">Quick templates</div>
+    <div class="tpls">
+      <div class="tpl" data-t="bfsi"><span class="ico">🏦</span><div><strong>Bank / BFSI with SOX</strong><span>SailPoint · SoD · PAM · Certifications</span></div></div>
+      <div class="tpl" data-t="health"><span class="ico">🏥</span><div><strong>Healthcare + HIPAA</strong><span>Saviynt · PAM · SSO · Compliance</span></div></div>
+      <div class="tpl" data-t="cloud"><span class="ico">☁️</span><div><strong>Cloud-first enterprise</strong><span>Saviynt + Okta · CIEM · IGA · SSO</span></div></div>
+      <div class="tpl" data-t="govt"><span class="ico">🏛️</span><div><strong>Government / Public sector</strong><span>SailPoint · IGA · PAM · SoD · Audit</span></div></div>
+      <div class="tpl" data-t="saas"><span class="ico">🚀</span><div><strong>SaaS startup</strong><span>Okta · SSO · MFA · JML</span></div></div>
+    </div>
+  </div>
+  <div class="sb-foot">
+    <button class="btn-gen" id="genBtn" onclick="generate()">▶ Generate solution design</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="bc">Identity Studio › <strong id="hTitle">New design</strong></div>
+    <div class="topbar-actions">
+      <button class="tbtn" onclick="exportHTML()">⬇ Export</button>
+      <button class="tbtn" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
+  <div class="canvas" id="canvas">
+    <div class="empty" id="empty">
+      <div class="ei">🔐</div>
+      <p>Fill in customer details and click <strong>Generate solution design</strong></p>
+    </div>
+    <div id="out">
+      <!-- badge row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px" class="a0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:inline-flex;align-items:center;padding:5px 13px;border-radius:20px;background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;font-size:12px;font-weight:700;" id="oBadge">🔐 Solution</div>
+          <span id="oMeta" style="font-size:11.5px;color:var(--muted)"></span>
+        </div>
+        <span id="oTime" style="font-size:10.5px;color:var(--muted);font-family:monospace"></span>
+      </div>
+
+      <!-- arch diagram -->
+      <div class="arch a1">
+        <div class="arch-head" id="archHead"><h3 id="aTitle"></h3><span class="meta" id="aMeta"></span></div>
+        <div class="arch-body">
+          <div class="cols">
+            <div class="src-col"><div class="col-lbl">Identity Sources</div><div id="srcCol"></div></div>
+            <div>
+              <div class="plat-box" id="platBox">
+                <div class="plat-name" id="platName"></div>
+                <div class="plat-users" id="platUsers">Approvers · Business Owners · Security Teams · Helpdesk</div>
+                <div class="mod-grid cols-2" id="modGrid"></div>
+                <div class="plat-footer" id="platFoot"></div>
+              </div>
+            </div>
+            <div class="tgt-col"><div class="col-lbl">Target Systems</div><div id="tgtCol"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- info row -->
+      <div class="info-row a2">
+        <div class="card">
+          <h4>Platform recommendation</h4>
+          <div class="rec-badge" id="recBadge"></div>
+          <div class="rec-body" id="recBody"></div>
+        </div>
+        <div class="card">
+          <h4>Implementation roadmap</h4>
+          <div id="roadmap"></div>
+        </div>
+        <div class="card">
+          <h4>Risk considerations</h4>
+          <div id="risks"></div>
+        </div>
+      </div>
+
+      <!-- spec -->
+      <div class="card a3">
+        <h4>Solution specification</h4>
+        <table class="spec-tbl" id="spec"></table>
+      </div>
+    </div>
+  </div>
+</main>
+</div><!-- end mainApp -->
+
+<script>
+// ─── LOGIN ───────────────────────────────────────────────────────────────────
+const VALID_USERS = [
+  { user:'admin',   pass:'identity@2026' },
+  { user:'demo',    pass:'demo123' },
+  { user:'saviynt', pass:'Saviynt@1' },
+  { user:'srini',   pass:'PaaSDirector123' },
+];
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  const ok = VALID_USERS.some(c => c.user === u && c.pass === p);
+  if (ok) {
+    document.getElementById('loginScreen').style.opacity = '0';
+    document.getElementById('loginScreen').style.transition = 'opacity .4s';
+    setTimeout(() => {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'flex';
+    }, 400);
+    err.classList.remove('show');
+  } else {
+    err.classList.add('show');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+// Allow Enter key on login fields
+['loginUser','loginPass'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+});
+
+// ─── TEMPLATES ──────────────────────────────────────────────────────────────
+const TMPLS = {
+  bfsi:   { name:'',  industry:'Banking / BFSI',    size:'50,000+',        sources:'SAP HR, AD / LDAP, Entra', platform:'SailPoint',        caps:['IGA','PAM','SoD','Cert','JML','Risk'] },
+  health: { name:'',  industry:'Healthcare',         size:'10,000–50,000',  sources:'Workday HR, AD, Epic EHR', platform:'Saviynt',           caps:['IGA','PAM','SSO','Cert','JML','Risk'] },
+  cloud:  { name:'',  industry:'Technology / SaaS',  size:'1,000–10,000',   sources:'Okta, AWS IAM, Azure AD',  platform:'Okta + SailPoint',  caps:['IGA','SSO','CIEM','JML','Risk'] },
+  govt:   { name:'',  industry:'Government',          size:'10,000–50,000',  sources:'HRMS, AD, Oracle HCM',     platform:'SailPoint',         caps:['IGA','PAM','SoD','Cert','JML','Risk'] },
+  saas:   { name:'',  industry:'Technology / SaaS',  size:'1–1,000',        sources:'Rippling HR, Google Workspace', platform:'Okta + SailPoint', caps:['IGA','SSO','JML'] },
+};
+
+// ─── PER-INDUSTRY MODULE LAYOUTS ────────────────────────────────────────────
+// Each industry defines EXACTLY which modules to show, their priority (PRIMARY/SECONDARY/GHOST), size (WIDE or normal), and content
+const INDUSTRY_MODULES = {
+  'Banking / BFSI': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Identity Governance & Access',   desc:'Role-based provisioning · Segregation of duties · SOX access controls · Automated entitlement reviews' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Privileged Access Management',    desc:'Privileged vault · Session recording · Dual-control approval · Break-glass access' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'SoD & SOX Compliance',           desc:'Conflict detection across SAP · Oracle · SWIFT · Policy engine · Audit-ready reporting' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Access Certifications',           desc:'Quarterly manager campaigns · SOX attestation · Auto-revoke on failure · Audit trail' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Risk & Fraud Analytics',         desc:'Behaviour intelligence · Suspicious access alerts · Risk-scoring for high-value accounts' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Joiner–Mover–Leaver',            desc:'HR-triggered provisioning · Role mining · Auto-deprovisioning on exit' },
+  ],
+  'Healthcare': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Clinical Identity Governance',   desc:'Role-based access to EHR · Epic / Cerner provisioning · Nurse & physician role templates' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Privileged Access Management',   desc:'Privileged session vault · EMR admin access control · Break-glass for emergencies' },
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'SSO / MFA for Clinical Staff',   desc:'SAML SSO for Epic, Cerner, Meditech · Smart-card + mobile MFA · Fast user switching at terminals' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'HIPAA Access Certifications',     desc:'Quarterly PHI access reviews · Compliance attestation · Automated revocation workflows' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Clinical Joiner–Mover–Leaver',   desc:'On-boarding clinicians & contractors · Auto-deactivation · Temp credential management' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'PHI Risk Analytics',             desc:'Anomalous PHI access detection · After-hours access alerts · HIPAA audit reports' },
+  ],
+  'Government': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Identity Governance & Audit',    desc:'Role-based access for civil servants · Mandatory separation of duties · Full audit trail for all access' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Privileged Access & Vaulting',   desc:'Admin account vaulting · Session recording · Dual-control for sensitive systems · Break-glass access' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'SoD & Regulatory Compliance',    desc:'Conflict detection · Anti-corruption access controls · Audit-ready compliance reports' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Mandatory Access Certifications', desc:'Periodic access reviews · Regulatory attestation · Auto-revoke workflows · Audit evidence export' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Civil Servant Lifecycle',        desc:'Hiring, transfer & exit workflows · Department-based role assignment · Contractor access expiry' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Security & Audit Analytics',     desc:'Insider threat detection · High-risk access scoring · Compliance dashboards · SIEM integration' },
+  ],
+  'Technology / SaaS': [
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'SSO / MFA & Federation',         desc:'Okta SSO for all SaaS apps · Adaptive MFA · SAML / OIDC · 7,000+ pre-built app integrations' },
+    { key:'JML',  pri:'PRIMARY',   icon:'👤', name:'Automated Joiner–Mover–Leaver',  desc:'Rippling / BambooHR sync · Instant provisioning on Day 1 · Auto-deprovision on exit' },
+    { key:'CIEM', pri:'PRIMARY',   icon:'☁️', name:'Cloud Entitlement Mgmt (CIEM)',  desc:'AWS IAM · Azure RBAC · GCP IAM visibility · Over-privileged identity detection · Least-privilege enforcement' },
+    { key:'IGA',  pri:'SECONDARY', icon:'🏛️', name:'SaaS Access Governance',         desc:'SaaS role cataloguing · Access request portal · Automated approvals for dev tools' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Risk & Anomaly Detection',       desc:'Unusual login detection · Lateral movement alerts · Cloud entitlement risk scoring' },
+  ],
+  'Manufacturing': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Plant & Corporate Identity Governance', desc:'SAP ERP role provisioning · Plant-specific access templates · Shop floor vs office separation' },
+    { key:'JML',  pri:'PRIMARY',   icon:'👤', name:'Worker Lifecycle Management',    desc:'On/off-boarding for contract workers · Seasonal workforce · Shift-based access profiles' },
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'SSO & Secure Authentication',    desc:'Single sign-on for SAP, MES, SCADA · MFA for remote access · OT/IT boundary controls' },
+    { key:'PAM',  pri:'SECONDARY', icon:'🔑', name:'OT / SCADA Privileged Access',  desc:'Privileged access to production systems · Session monitoring · Emergency break-glass' },
+    { key:'SoD',  pri:'SECONDARY', icon:'⚖️', name:'SoD Controls',                  desc:'Purchase-to-pay conflict detection · SAP SoD rules · Audit-ready conflict reports' },
+  ],
+  'Retail / E-commerce': [
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Customer & Staff SSO / MFA',     desc:'Workforce SSO · Seasonal staff onboarding at scale · MFA for PCI-sensitive systems' },
+    { key:'JML',  pri:'PRIMARY',   icon:'👤', name:'High-Volume Joiner–Mover–Leaver', desc:'Seasonal hiring spikes · Store associate provisioning · Instant deactivation at exit' },
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'PCI-DSS Access Governance',      desc:'Cardholder data access control · PCI role segregation · Annual access certification' },
+    { key:'SoD',  pri:'SECONDARY', icon:'⚖️', name:'SoD & PCI Compliance',          desc:'Finance conflict detection · PCI-DSS separation of duties · Audit reports' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Fraud & Risk Analytics',         desc:'Insider threat detection · After-hours POS access · Anomalous order management alerts' },
+  ],
+  'Insurance': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Policyholder Data Governance',   desc:'Agent & adjuster role-based access · Claims system provisioning · Regulatory access controls' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'SoD & Regulatory Compliance',    desc:'Claims adjuster conflict detection · Anti-fraud SoD rules · NAIC / FCA compliance reports' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Access Certifications',           desc:'Annual regulatory attestation · Manager-driven access reviews · Automated compliance evidence' },
+    { key:'PAM',  pri:'SECONDARY', icon:'🔑', name:'Privileged Access Management',   desc:'Core system admin vaulting · Session recording · Dual-control for policy changes' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Agent & Broker Lifecycle',       desc:'Licensed agent onboarding · Territory-based access · Immediate deactivation on termination' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Insurance Risk Analytics',       desc:'Claims fraud access patterns · Suspicious policy modification alerts · Regulatory dashboards' },
+  ],
+};
+
+// ─── PER-INDUSTRY SOURCES ───────────────────────────────────────────────────
+const INDUSTRY_SOURCES = {
+  'Banking / BFSI':    [{t:'HR System',sub:'SAP HR / SuccessFactors'},{t:'Directories',sub:'AD / LDAP / Entra'},{t:'Applications',sub:'SAP ERP · Core Banking'},{t:'Databases',sub:'Oracle · SQL Server'}],
+  'Healthcare':        [{t:'HR System',sub:'Workday / Oracle HCM'},{t:'Directories',sub:'AD / Entra'},{t:'Clinical Apps',sub:'Epic · Cerner · Meditech'},{t:'Cloud Identity',sub:'AWS IAM · Azure AD'}],
+  'Government':        [{t:'HR System',sub:'Oracle HCM / HRMS'},{t:'Directories',sub:'AD / LDAP'},{t:'Applications',sub:'Oracle EBS · Custom apps'},{t:'Databases',sub:'Oracle · PostgreSQL'}],
+  'Technology / SaaS': [{t:'HR System',sub:'Rippling · BambooHR'},{t:'Cloud Identity',sub:'Okta · AWS IAM · Azure AD'},{t:'SaaS Apps',sub:'GitHub · Jira · Salesforce'},{t:'Databases',sub:'RDS · Snowflake'}],
+  'Manufacturing':     [{t:'HR System',sub:'SAP HCM / Workday'},{t:'Directories',sub:'AD / LDAP'},{t:'Applications',sub:'SAP ERP · MES · SCADA'},{t:'Databases',sub:'Oracle · SQL Server'}],
+  'Retail / E-commerce':[{t:'HR System',sub:'Workday / Rippling'},{t:'Directories',sub:'AD / Entra'},{t:'Applications',sub:'POS · ERP · Commerce platform'},{t:'Databases',sub:'Oracle · MySQL'}],
+  'Insurance':         [{t:'HR System',sub:'Oracle HCM / SAP HR'},{t:'Directories',sub:'AD / LDAP / Entra'},{t:'Applications',sub:'Policy mgmt · Claims system'},{t:'Databases',sub:'Oracle · SQL Server'}],
+};
+
+// ─── PER-INDUSTRY TARGETS ───────────────────────────────────────────────────
+const INDUSTRY_TARGETS = {
+  'Banking / BFSI':    [{t:'Applications',s:'SAP ERP · Core banking',b:'ERP'},{t:'Cloud platforms',s:'AWS · Azure · GCP',b:'CLOUD'},{t:'Databases',s:'Oracle · SQL Server',b:'DB'},{t:'Infrastructure',s:'Windows · Linux · Unix',b:'INFRA'},{t:'APIs & Services',s:'REST · SCIM · SOAP',b:'API'}],
+  'Healthcare':        [{t:'Clinical Apps',s:'Epic · Cerner · Meditech',b:'EHR'},{t:'Cloud platforms',s:'AWS · Azure',b:'CLOUD'},{t:'Databases',s:'Oracle · SQL Server',b:'DB'},{t:'Infrastructure',s:'Windows · Linux',b:'INFRA'},{t:'APIs & Services',s:'HL7 · FHIR · REST',b:'API'}],
+  'Government':        [{t:'Applications',s:'Oracle EBS · Custom',b:'ERP'},{t:'Databases',s:'Oracle · PostgreSQL',b:'DB'},{t:'Infrastructure',s:'Windows · Unix · Linux',b:'INFRA'},{t:'Directory Services',s:'AD · LDAP',b:'DIR'},{t:'Audit Systems',s:'SIEM · Log mgmt',b:'AUDIT'}],
+  'Technology / SaaS': [{t:'Cloud platforms',s:'AWS · Azure · GCP',b:'CLOUD'},{t:'SaaS apps',s:'Salesforce · ServiceNow · Jira',b:'SAAS'},{t:'Databases',s:'RDS · MongoDB · Snowflake',b:'DB'},{t:'APIs & Services',s:'REST · SCIM · GraphQL',b:'API'},{t:'Dev platforms',s:'GitHub · Kubernetes',b:'DEV'}],
+  'Manufacturing':     [{t:'Applications',s:'SAP ERP · MES · SCADA',b:'ERP'},{t:'Cloud platforms',s:'AWS · Azure',b:'CLOUD'},{t:'Databases',s:'Oracle · SQL Server',b:'DB'},{t:'Infrastructure',s:'Windows · Linux · OT',b:'INFRA'},{t:'APIs & Services',s:'REST · OPC-UA · SOAP',b:'API'}],
+  'Retail / E-commerce':[{t:'Applications',s:'POS · ERP · eCommerce',b:'ERP'},{t:'Cloud platforms',s:'AWS · Azure · GCP',b:'CLOUD'},{t:'Databases',s:'Oracle · MySQL',b:'DB'},{t:'Infrastructure',s:'Windows · Linux',b:'INFRA'},{t:'APIs & Services',s:'REST · SCIM · PCI',b:'API'}],
+  'Insurance':         [{t:'Applications',s:'Policy mgmt · Claims',b:'ERP'},{t:'Cloud platforms',s:'AWS · Azure',b:'CLOUD'},{t:'Databases',s:'Oracle · SQL Server',b:'DB'},{t:'Infrastructure',s:'Windows · Unix',b:'INFRA'},{t:'APIs & Services',s:'REST · SCIM · SOAP',b:'API'}],
+};
+
+// ─── PLATFORM × INDUSTRY MODULE OVERRIDES ───────────────────────────────────
+// Key: "Platform|Industry" → completely different module set
+const PLAT_INDUSTRY_MODULES = {
+
+  // ── BANKING ──────────────────────────────────────────────────────────────
+  'SailPoint|Banking / BFSI': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'SailPoint IGA – Access Governance',      desc:'IdentityNow role-based provisioning · SOX entitlement controls · SWIFT access policy · Automated request workflows' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'SoD Engine – SOX Compliance',            desc:'SailPoint SoD ruleset for SAP · Oracle · SWIFT · Conflict remediation workflows · SOX audit evidence export' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Access Certifications – SOX Attestation', desc:'IdentityNow campaign scheduler · Manager-driven SOX attestations · Automated revocation · Audit-ready sign-off' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Privileged Access – CyberArk Integration', desc:'SailPoint + CyberArk connector · Privileged role governance · Session recording · Entitlement correlation' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'IdentityAI – Risk Intelligence',          desc:'AI-driven risk scoring · Peer group analytics · Outlier access detection · Predictive access recommendations' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Joiner–Mover–Leaver (SAP HR)',           desc:'SAP SuccessFactors sync · Role assignment on hire · Auto-deprovisioning on exit · Mover re-certification trigger' },
+  ],
+
+  'Saviynt|Banking / BFSI': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Saviynt IGA – Enterprise Access Cloud',  desc:'Saviynt EIC provisioning · SOX access controls · SAP HR sync · Role-based entitlement management' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Saviynt PAM – Privileged Vault',         desc:'Built-in PAM vault (no 3rd party) · Session recording · JIT privileged access · Break-glass workflows' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'Saviynt SoD – Policy Engine',            desc:'Native SoD ruleset · Cross-app conflict detection · SOX policy engine · Preventive SoD at request time' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Saviynt Certifications',                  desc:'Automated quarterly campaigns · Risk-weighted review routing · SOX attestation · Single-platform audit trail' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Saviynt Analytics – Risk Intelligence',  desc:'Behaviour analytics · Anomaly detection · High-risk account scoring · Automated remediation triggers' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Joiner–Mover–Leaver',                   desc:'SAP HR / SuccessFactors sync · Role mining · Birthright provisioning · Instant deactivation on exit' },
+  ],
+
+  'Okta + SailPoint|Banking / BFSI': [
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Okta SSO + Adaptive MFA',                desc:'Okta Workforce Identity · Adaptive MFA for banking portals · SAML / OIDC federation · Risk-based step-up auth' },
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'SailPoint IGA – Governance Layer',       desc:'IdentityNow provisioning · SOX entitlement controls · Access request portal · Approval workflow engine' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'SailPoint SoD – SOX Controls',           desc:'SoD conflict detection · SAP + Oracle ruleset · Preventive SoD at request · SOX audit evidence' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'SailPoint Certifications',                desc:'SOX attestation campaigns · Manager-driven reviews · Okta-sourced entitlement certification' },
+    { key:'PAM',  pri:'SECONDARY', icon:'🔑', name:'Okta Privileged Access',                 desc:'Okta PAM for privileged sessions · JIT access · Admin credential vaulting · Session audit' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Okta ThreatInsight + SailPoint AI',      desc:'Okta ThreatInsight signals · SailPoint IdentityAI risk scores · Combined risk dashboard' },
+  ],
+
+  'Microsoft Entra|Banking / BFSI': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Entra ID Governance',                    desc:'Entitlement management · Access packages · SOX access controls · Lifecycle workflows for banking staff' },
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Entra SSO + Conditional Access',         desc:'M365 SSO · Conditional Access policies · Phishing-resistant MFA · FIDO2 + Windows Hello' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Entra Access Reviews',                    desc:'Recurring SOX access reviews · Group + app review campaigns · Auto-revoke on inactivity · Audit export' },
+    { key:'SoD',  pri:'SECONDARY', icon:'⚖️', name:'Entra SoD via Access Packages',         desc:'Incompatible access package controls · Finance role conflict prevention · Compliance policy enforcement' },
+    { key:'PAM',  pri:'SECONDARY', icon:'🔑', name:'Entra PIM – Privileged Identity Mgmt',  desc:'Just-in-time privileged access · Azure + M365 role activation · Approval workflows · Privileged audit logs' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Entra ID Protection + Sentinel',        desc:'Real-time risk detection · Suspicious sign-in alerts · Microsoft Sentinel SIEM integration · Auto-block risky users' },
+  ],
+
+  // ── HEALTHCARE ────────────────────────────────────────────────────────────
+  'Saviynt|Healthcare': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Saviynt Clinical Identity Governance',   desc:'Epic / Cerner provisioning via Saviynt EIC · Nurse & physician role templates · PHI access controls' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Saviynt PAM – Clinical Privileged Access', desc:'EMR admin vaulting · Break-glass emergency access · Session recording · JIT for on-call clinicians' },
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Saviynt SSO – Clinical Workforce',        desc:'SAML SSO for Epic, Cerner, Meditech · Rapid user switching at shared terminals · Smart card MFA' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'HIPAA Access Certifications',             desc:'Quarterly PHI access reviews · Saviynt automated routing · Compliance attestation · Audit log export' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Clinical Joiner–Mover–Leaver',           desc:'Workday HR sync · Clinician on-boarding · Travel nurse temp access · Auto-deactivation on exit' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Saviynt Analytics – PHI Risk',           desc:'After-hours PHI access anomalies · Suspicious record lookups · HIPAA audit dashboards' },
+  ],
+
+  'Okta + SailPoint|Healthcare': [
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Okta SSO – Clinical Federation',         desc:'Okta Workforce SSO for Epic, Cerner · Smart-card + mobile MFA · Fast terminal switching · SAML federation' },
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'SailPoint IGA – Clinical Governance',    desc:'IdentityNow EHR provisioning · HIPAA role-based access · Nurse / physician entitlement management' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'SailPoint HIPAA Certifications',          desc:'PHI access campaign scheduler · Compliance attestation · Auto-revoke on non-response · Audit trail' },
+    { key:'PAM',  pri:'SECONDARY', icon:'🔑', name:'Okta PAM – Clinical Privileged Access',  desc:'EMR admin session vaulting · Okta Privileged Access · JIT for on-call staff · Break-glass workflows' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Clinical Lifecycle (Okta Lifecycle Mgmt)', desc:'Workday sync via Okta Lifecycle · Day-1 EHR access · Travel nurse provisioning · Auto-deactivation' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Okta ThreatInsight – PHI Analytics',     desc:'After-hours login anomalies · Suspicious EHR record access · Okta risk signals + HIPAA audit reports' },
+  ],
+
+  // ── GOVERNMENT ────────────────────────────────────────────────────────────
+  'SailPoint|Government': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'SailPoint IGA – Civil Servant Governance', desc:'IdentityNow role provisioning for civil servants · Department-based access templates · Full audit trail' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Privileged Vaulting – CyberArk Integration', desc:'SailPoint + CyberArk correlation · Admin account governance · Session recording · Dual-control approval' },
+    { key:'SoD',  pri:'PRIMARY',   icon:'⚖️', name:'SailPoint SoD – Anti-corruption Controls', desc:'Conflict detection for procurement & finance roles · Policy engine · Audit-ready compliance evidence' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Mandatory Access Certifications',          desc:'Regulatory review campaigns · Departmental attestation · Auto-revoke · Audit export for inspectors' },
+    { key:'JML',  pri:'SECONDARY', icon:'👤', name:'Civil Servant Lifecycle',                 desc:'HRMS / Oracle HCM sync · Hiring, transfer & exit workflows · Contractor access expiry management' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'IdentityAI – Insider Threat Detection',  desc:'AI risk scoring · Unusual access-pattern flagging · High-risk account monitoring · SIEM integration' },
+  ],
+
+  'Microsoft Entra|Government': [
+    { key:'IGA',  pri:'PRIMARY',   icon:'🏛️', name:'Entra ID Governance – Civil Servant Access', desc:'Access packages for departments · Lifecycle workflows · Entitlement mgmt · Full audit trail for all access' },
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Entra SSO + Conditional Access',          desc:'M365 + Gov cloud SSO · Phishing-resistant MFA · FIDO2 hardware keys · Zero-trust network access' },
+    { key:'Cert', pri:'PRIMARY',   icon:'✅', name:'Entra Access Reviews – Regulatory',        desc:'Mandatory periodic reviews · Departmental group reviews · Auto-revoke on inactivity · Audit evidence' },
+    { key:'PAM',  pri:'PRIMARY',   icon:'🔑', name:'Entra PIM – Privileged Identity Mgmt',   desc:'JIT privileged access to Azure Gov · Role activation with approval · Privileged audit logs · Break-glass' },
+    { key:'SoD',  pri:'SECONDARY', icon:'⚖️', name:'Entra SoD via Access Packages',          desc:'Incompatible role conflict control · Procurement / finance separation · Compliance policy enforcement' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Entra ID Protection + Sentinel',         desc:'Real-time risk detection · Suspicious login alerts · Microsoft Sentinel SIEM · Insider threat analytics' },
+  ],
+
+  // ── TECHNOLOGY / SAAS ──────────────────────────────────────────────────────
+  'Okta + SailPoint|Technology / SaaS': [
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Okta SSO – SaaS App Federation',         desc:'7,000+ OIN app integrations · Adaptive MFA · SAML / OIDC / SCIM · Universal Directory as identity hub' },
+    { key:'JML',  pri:'PRIMARY',   icon:'👤', name:'Okta Lifecycle Mgmt – Day-1 Automation', desc:'Rippling / BambooHR HR sync · Instant app provisioning on hire · Auto-deactivation on exit · SCIM push' },
+    { key:'CIEM', pri:'PRIMARY',   icon:'☁️', name:'CIEM – Cloud Entitlement Mgmt',          desc:'AWS IAM, Azure RBAC, GCP IAM visibility · Over-privileged role detection · Least-privilege enforcement' },
+    { key:'IGA',  pri:'SECONDARY', icon:'🏛️', name:'SailPoint IGA – SaaS Governance',        desc:'SaaS access cataloguing · Developer tool access requests · Access certification campaigns' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Okta ThreatInsight – Risk Analytics',    desc:'Suspicious login detection · Bot traffic blocking · Credential stuffing protection · SIEM integration' },
+  ],
+
+  'Saviynt|Technology / SaaS': [
+    { key:'SSO',  pri:'PRIMARY',   icon:'🔐', name:'Saviynt SSO + MFA Federation',           desc:'SAML 2.0 / OIDC · Adaptive MFA · SaaS app integrations · Saviynt identity fabric for cloud-first orgs' },
+    { key:'CIEM', pri:'PRIMARY',   icon:'☁️', name:'Saviynt CIEM – Cloud Entitlements',      desc:'AWS · Azure · GCP entitlement visibility · Least-privilege enforcement · Cloud resource access governance' },
+    { key:'JML',  pri:'PRIMARY',   icon:'👤', name:'Saviynt JML – Automated Lifecycle',      desc:'HR system sync · Instant SaaS provisioning · Birthright access · Auto-deprovisioning with audit log' },
+    { key:'IGA',  pri:'SECONDARY', icon:'🏛️', name:'Saviynt EIC – SaaS Access Governance',  desc:'SaaS role cataloguing · Access request portal · Policy engine · Automated approvals for dev tools' },
+    { key:'Risk', pri:'SECONDARY', icon:'📊', name:'Saviynt Analytics – Cloud Risk',         desc:'Cloud entitlement risk scoring · Anomalous API access · Lateral movement detection · Security dashboards' },
+  ],
+};
+
+// ─── PER-PLATFORM META ──────────────────────────────────────────────────────
+const PLAT = {
+  'Saviynt':          { label:'SAVIYNT IDENTITY SECURITY PLATFORM', grad:'linear-gradient(135deg,#3730A3,#7C3AED)', foot:['Risk intelligence · Behavior analytics · Anomaly detection · Automated remediation','Platform services · Policy engine · Workflow · Connectors · APIs & extensibility','Provisioning layer · Out-of-box connectors · REST APIs · Custom connectors · Agents'], rec:'Saviynt is the strongest fit — native cloud-born, unified IGA + PAM on one platform, deep compliance baked in, and 200+ out-of-box connectors reducing integration risk significantly.' },
+  'SailPoint':        { label:'SAILPOINT IDENTITY SECURITY PLATFORM', grad:'linear-gradient(135deg,#075985,#0EA5E9)', foot:['AI-driven risk scoring · Predictive access · Behaviour analytics · IdentityAI','Workflow engine · Policy engine · Connectors · SailPoint App catalog · APIs','Cloud-hosted SaaS · REST APIs · Virtual Appliance (VA) · SCIM · Event triggers'], rec:'SailPoint IdentityNow is purpose-built for large, complex enterprises needing strong SOX/SoD controls, mature access certification workflows, and a rich connector ecosystem for on-prem + cloud.' },
+  'Okta + SailPoint': { label:'OKTA + SAILPOINT IDENTITY PLATFORM', grad:'linear-gradient(135deg,#92400E,#D97706)', foot:['Adaptive MFA · Risk-based auth · ThreatInsight · Behaviour analytics','Okta Workflows · SailPoint engine · SCIM · SAML / OIDC · Policy engine','Cloud-native · REST APIs · OIN (7,000+ integrations) · SailPoint connectors'], rec:'Okta + SailPoint is the best-of-breed combination — Okta handles workforce authentication and SSO while SailPoint drives IGA, certifications and SoD. Ideal for SaaS-heavy, high-growth environments.' },
+  'Microsoft Entra':  { label:'MICROSOFT ENTRA IDENTITY PLATFORM', grad:'linear-gradient(135deg,#1E3A8A,#2563EB)', foot:['Conditional Access · Identity Protection · Risk-based MFA · AI threat signals','Entra ID Governance · Access reviews · Lifecycle workflows · Entitlement mgmt','Microsoft Graph API · SCIM · SAML · OIDC · Seamless SSO · Azure RBAC'], rec:'Microsoft Entra is the natural fit for Microsoft-heavy environments — native M365, Azure, and Intune integration, Conditional Access, and Entra ID Governance at a lower total cost than third-party alternatives.' },
+};
+
+// ─── ROADMAPS ───────────────────────────────────────────────────────────────
+const ROADS = {
+  'Banking / BFSI':    [{p:'Foundation',d:'IGA core, SAP HR sync, AD provisioning',w:'12 wks'},{p:'Compliance & SoD',d:'SOX SoD policies, PAM vault, conflict rules',w:'10 wks'},{p:'Certifications',d:'Quarterly campaign setup, audit evidence automation',w:'6 wks'},{p:'Analytics',d:'Risk dashboards, SIEM integration, auto-remediation',w:'8 wks'}],
+  'Healthcare':        [{p:'Core IGA',d:'HR sync, AD + Epic provisioning, role templates',w:'10 wks'},{p:'HIPAA Compliance',d:'PHI access controls, certifications, audit logs',w:'8 wks'},{p:'PAM + SSO',d:'Privileged vault, SAML SSO, MFA for clinical staff',w:'8 wks'},{p:'Analytics',d:'PHI risk monitoring, anomaly detection, dashboards',w:'6 wks'}],
+  'Government':        [{p:'Foundation',d:'Core IGA, HR sync, AD provisioning',w:'12 wks'},{p:'PAM & SoD',d:'Privileged vaulting, conflict detection, audit controls',w:'10 wks'},{p:'Certifications',d:'Mandatory access reviews, regulatory attestation',w:'6 wks'},{p:'Analytics',d:'Insider threat monitoring, compliance dashboards',w:'8 wks'}],
+  'Technology / SaaS': [{p:'SSO & MFA',d:'Okta SSO, adaptive MFA, app integrations rollout',w:'6 wks'},{p:'JML Automation',d:'HR sync, Day-1 provisioning, exit deactivation',w:'6 wks'},{p:'CIEM',d:'Cloud entitlement visibility, least-privilege enforcement',w:'6 wks'},{p:'Governance',d:'Access cataloguing, risk analytics, developer tooling',w:'5 wks'}],
+  'Manufacturing':     [{p:'Foundation',d:'SAP HR sync, AD provisioning, plant role templates',w:'10 wks'},{p:'SAP Access Governance',d:'SoD rules, SAP role management, access requests',w:'8 wks'},{p:'Worker Lifecycle',d:'Contractor onboarding, seasonal access, deprovisioning',w:'6 wks'},{p:'OT / PAM',d:'SCADA privileged access, session monitoring',w:'6 wks'}],
+  'default':           [{p:'Foundation',d:'Core IGA, HR connectors, provisioning workflows',w:'10 wks'},{p:'Governance',d:'Certifications, SoD policies, access controls',w:'8 wks'},{p:'Integration',d:'Cloud platforms, SaaS connectors, SSO',w:'6 wks'},{p:'Analytics',d:'Risk analytics, dashboards, automation',w:'5 wks'}],
+};
+
+// ─── RISKS ──────────────────────────────────────────────────────────────────
+const RISKS = {
+  'Banking / BFSI':    [{c:'#EF4444',t:'SOX audit timeline pressure — align certification campaigns before Q1 close'},{c:'#F59E0B',t:'Legacy core-banking provisioning may need custom connector development'},{c:'#F59E0B',t:'SoD rule library definition requires significant business SME involvement (8–12 wks)'},{c:'#10B981',t:'Pre-built SAP + Oracle banking connectors reduce integration risk significantly'}],
+  'Healthcare':        [{c:'#EF4444',t:'PHI data in provisioning flows — must classify and restrict from IGA platform logs'},{c:'#F59E0B',t:'Epic / Cerner role taxonomy mapping is complex — plan 6–8 wks for role design'},{c:'#F59E0B',t:'Clinical MFA rollout needs careful change management to avoid workflow disruption'},{c:'#10B981',t:'Saviynt HIPAA compliance accelerator pack reduces controls build time by ~40%'}],
+  'Government':        [{c:'#EF4444',t:'Security clearance integration with IGA can be complex — involve CISO early'},{c:'#F59E0B',t:'Legacy HRMS connectors may need VA (Virtual Appliance) or middleware layer'},{c:'#F59E0B',t:'Regulatory approval cycles for tooling selection may extend Phase 1 timeline'},{c:'#10B981',t:'SailPoint FedRAMP-authorised deployment reduces compliance risk for federal agencies'}],
+  'Technology / SaaS': [{c:'#F59E0B',t:'Rapid headcount growth can outpace IGA role design — use dynamic group-based provisioning'},{c:'#F59E0B',t:'Shadow IT SaaS sprawl — CIEM discovery phase needed before entitlement enforcement'},{c:'#10B981',t:'Okta OIN library (7,000+ apps) dramatically reduces SaaS connector build effort'},{c:'#10B981',t:'API-first architecture allows fast iteration — MVP in 6 weeks is achievable'}],
+  'Manufacturing':     [{c:'#EF4444',t:'OT / SCADA environments need air-gap assessment before PAM integration'},{c:'#F59E0B',t:'SAP role complexity in manufacturing — S/4HANA migration may change role model mid-project'},{c:'#F59E0B',t:'Contractor identity management at plant level requires custom workflows'},{c:'#10B981',t:'SAP-certified IGA connectors available out-of-box — reduces SAP integration risk'}],
+  'default':           [{c:'#F59E0B',t:'Change management — user adoption of self-service access requests needs training plan'},{c:'#F59E0B',t:'Directory integration complexity may extend foundation phase by 2–3 weeks'},{c:'#10B981',t:'Pre-built SaaS connectors for top 200 apps reduce integration effort significantly'}],
+};
+
+// ─── PLATFORM AUTO-RECOMMEND ────────────────────────────────────────────────
+function autoPlat(industry, caps) {
+  if (industry === 'Banking / BFSI' || industry === 'Government' || industry === 'Insurance') return 'SailPoint';
+  if (industry === 'Healthcare' || industry === 'Manufacturing') return 'Saviynt';
+  if (industry === 'Technology / SaaS' || industry === 'Retail / E-commerce') return 'Okta + SailPoint';
+  return 'Saviynt';
+}
+
+// ─── CHIP TOGGLE ────────────────────────────────────────────────────────────
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => c.classList.toggle('on')));
+document.querySelectorAll('.tpl').forEach(t => t.addEventListener('click', () => {
+  const d = TMPLS[t.dataset.t];
+  document.getElementById('iIndustry').value  = d.industry;
+  document.getElementById('iSize').value      = d.size;
+  document.getElementById('iSources').value   = d.sources;
+  document.getElementById('iPlatform').value  = d.platform;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', d.caps.includes(c.dataset.v)));
+}));
+
+// ─── GENERATE ───────────────────────────────────────────────────────────────
+function generate() {
+  const name     = document.getElementById('iName').value.trim() || 'Customer';
+  const industry = document.getElementById('iIndustry').value   || 'Banking / BFSI';
+  const size     = document.getElementById('iSize').value       || '10,000–50,000';
+  const sources  = document.getElementById('iSources').value.trim();
+  const rawP     = document.getElementById('iPlatform').value;
+  const platform = (!rawP || rawP === '') ? autoPlat(industry) : rawP;
+  const caps     = [...document.querySelectorAll('.chip.on')].map(c => c.dataset.v);
+
+  const btn = document.getElementById('genBtn');
+  btn.classList.add('busy'); btn.textContent = '⏳ Generating…';
+  setTimeout(() => {
+    btn.classList.remove('busy'); btn.textContent = '▶ Generate solution design';
+    render({ name, industry, size, sources, platform, caps });
+  }, 600);
+}
+
+function render({ name, industry, size, sources, platform, caps }) {
+  document.getElementById('empty').style.display = 'none';
+  const out = document.getElementById('out');
+  out.style.display = 'flex'; out.style.flexDirection = 'column'; out.style.gap = '16px';
+  // replay animations
+  out.querySelectorAll('[class*="a"]').forEach(el => { el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });
+
+  const pm   = PLAT[platform] || PLAT['Saviynt'];
+  const year = new Date().getFullYear();
+
+  document.getElementById('hTitle').textContent  = `${name} — Identity Design`;
+  document.getElementById('oBadge').textContent  = `🔐 ${name} — Identity Solution`;
+  document.getElementById('oMeta').textContent   = `${industry} · ${size} employees · ${year}`;
+  document.getElementById('oTime').textContent   = `Generated ${new Date().toLocaleString()}`;
+  document.getElementById('aTitle').textContent  = `${name} — ${pm.label}`;
+  document.getElementById('aMeta').textContent   = `${industry} · ${size} employees · ${year}`;
+  document.getElementById('archHead').style.background = pm.grad;
+  document.getElementById('platName').textContent = pm.label;
+  document.getElementById('platName').style.color = '#4F46E5';
+
+  // ── Sources ──
+  const srcCol = document.getElementById('srcCol');
+  srcCol.innerHTML = '';
+  const srcList = INDUSTRY_SOURCES[industry] || INDUSTRY_SOURCES['Banking / BFSI'];
+  // Override with custom input if provided
+  const customSrc = sources ? sources.split(',').map(s => s.trim()).filter(Boolean) : null;
+  if (customSrc && customSrc.length > 0) {
+    const groups = [
+      { t:'HR System',      rx:/HR|Workday|Rippling|HCM|HRMS|SuccessFactors/i },
+      { t:'Directories',    rx:/AD|LDAP|Entra|Directory/i },
+      { t:'Cloud Identity', rx:/AWS|Azure|GCP|IAM|Okta/i },
+      { t:'Databases',      rx:/SQL|Oracle|Postgres|DB/i },
+      { t:'Applications',   rx:/ERP|SAP|EBS|Epic|EHR|Cerner|Custom/i },
+    ];
+    let used = new Set();
+    groups.forEach(g => {
+      const matches = customSrc.filter(s => g.rx.test(s) && !used.has(s));
+      if (matches.length) { matches.forEach(s => used.add(s)); srcCol.insertAdjacentHTML('beforeend', `<div class="src-card"><div class="st">${g.t}</div><div class="ss">${matches.join(', ')}</div></div>`); }
+    });
+    const rest = customSrc.filter(s => !used.has(s));
+    if (rest.length) srcCol.insertAdjacentHTML('beforeend', `<div class="src-card"><div class="st">Other sources</div><div class="ss">${rest.join(', ')}</div></div>`);
+    if (!srcCol.innerHTML) srcList.forEach(s => srcCol.insertAdjacentHTML('beforeend', `<div class="src-card"><div class="st">${s.t}</div><div class="ss">${s.sub}</div></div>`));
+  } else {
+    srcList.forEach(s => srcCol.insertAdjacentHTML('beforeend', `<div class="src-card"><div class="st">${s.t}</div><div class="ss">${s.sub}</div></div>`));
+  }
+
+  // ── Modules — platform × industry lookup first, then industry fallback ──
+  const modGrid = document.getElementById('modGrid');
+  modGrid.innerHTML = '';
+  const overrideKey = `${platform}|${industry}`;
+  const allMods = PLAT_INDUSTRY_MODULES[overrideKey] || INDUSTRY_MODULES[industry] || INDUSTRY_MODULES['Banking / BFSI'];
+  // Filter by selected caps; if none selected show all
+  const selectedKeys = caps.length > 0 ? caps : allMods.map(m => m.key);
+  const toShow = allMods.filter(m => selectedKeys.includes(m.key));
+  const finalMods = toShow.length >= 2 ? toShow : allMods;
+
+  finalMods.forEach(m => {
+    modGrid.insertAdjacentHTML('beforeend', `
+      <div class="mod ${m.pri}">
+        <div class="mi">${m.icon}</div>
+        <div class="mn">${m.name}</div>
+        <div class="md">${m.desc}</div>
+      </div>`);
+  });
+
+  // ── Platform footer ──
+  const foot = document.getElementById('platFoot');
+  foot.innerHTML = pm.foot.map((r,i) => `<div class="pf ${i!==1?'bold':''}">${r}</div>`).join('');
+
+  // ── Targets ──
+  const tgtCol = document.getElementById('tgtCol');
+  tgtCol.innerHTML = '';
+  const tgts = INDUSTRY_TARGETS[industry] || INDUSTRY_TARGETS['Banking / BFSI'];
+  tgts.forEach(t => tgtCol.insertAdjacentHTML('beforeend', `<div class="tgt-card"><div class="st">${t.t}</div><div class="ss">${t.s}</div><span class="badge">${t.b}</span></div>`));
+
+  // ── Recommendation ──
+  document.getElementById('recBadge').textContent = platform;
+  document.getElementById('recBadge').style.background = pm.grad;
+  document.getElementById('recBody').textContent = pm.rec;
+
+  // ── Roadmap ──
+  const road = document.getElementById('roadmap');
+  road.innerHTML = '';
+  const phases = ROADS[industry] || ROADS['default'];
+  phases.forEach((p,i) => road.insertAdjacentHTML('beforeend', `
+    <div class="phase">
+      <div class="pnum">${i+1}</div>
+      <div class="pinfo"><strong>${p.p}</strong><span>${p.d}</span></div>
+      <div class="pdur">${p.w}</div>
+    </div>`));
+
+  // ── Risks ──
+  const riskEl = document.getElementById('risks');
+  riskEl.innerHTML = '';
+  const riskData = RISKS[industry] || RISKS['default'];
+  riskData.forEach(r => riskEl.insertAdjacentHTML('beforeend', `
+    <div class="risk"><div class="rdot" style="background:${r.c}"></div><div class="rtxt">${r.t}</div></div>`));
+
+  // ── Spec ──
+  const modNames = finalMods.map(m => m.name.split(' ').slice(0,2).join(' ')).join(', ');
+  const totalWks = phases.reduce((a,p) => a + parseInt(p.w), 0);
+  document.getElementById('spec').innerHTML = [
+    ['Customer',            name],
+    ['Industry',            industry],
+    ['Employee count',      size],
+    ['Identity platform',   platform],
+    ['Identity sources',    sources || srcList.map(s=>s.t).join(', ')],
+    ['Capabilities deployed', modNames],
+    ['Total implementation', totalWks + ' weeks across ' + phases.length + ' phases'],
+    ['Target systems',      tgts.map(t=>t.t).join(', ')],
+    ['Compliance focus',    industry==='Banking / BFSI'?'SOX · RBI · Basel III':industry==='Healthcare'?'HIPAA · HITECH · HL7':industry==='Government'?'FedRAMP · FISMA · ISO 27001':industry==='Manufacturing'?'ISO 27001 · IEC 62443 · GDPR':'ISO 27001 · SOC 2 · GDPR'],
+    ['Deployment model',    platform==='Microsoft Entra'?'Microsoft Cloud (Azure)':'SaaS / Cloud-hosted'],
+  ].map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+}
+
+function exportHTML() {
+  const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'identity-solution-design.html'; a.click();
+}
+</script>
+</body>
+</html>
